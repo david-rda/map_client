@@ -44,6 +44,21 @@
                         <div class="form-group mb-3">
                             <input type="file" class="form-control" id="files" @change="handleFileUpload" multiple />
                         </div>
+
+                        <div class="border rounded mb-2 p-2" v-for="data in this.photos" :key="data.id">
+                            <div class="d-flex justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <p>
+                                        <img :src="'http://localhost:8000/images/' + data.name" class="img-thumbnail" style="width:50px;height:50px">
+                                        {{ data.name }}
+                                    </p>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <button type="button" :data-id="data.id" class="btn btn-danger" @click="deletePhoto($event)">წაშლა</button>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="form-group d-grid">
                             <input type="submit" class="btn btn-success" value="დარედაქტირება">
                         </div>
@@ -77,13 +92,15 @@
                 latitude : "",
                 selectedFiles: [],
 
+                photos : [],
+
                 message : ""
             }
         },
 
         methods : {
             handleFileUpload(event) {
-                this.selectedFiles = event.target.files;
+                this.selectedFiles = Array.from(event.target.files);
             },
 
             signout() {
@@ -97,7 +114,29 @@
                 });
             },
 
+            deletePhoto(event) {
+                const token = JSON.parse(window.localStorage.getItem("user")).token
+
+                const id = event.target.getAttribute("data-id");
+
+                const thi_s = this;
+
+                axios.delete("/enterprise/delete/photo/" + id + "/" + this.$route.params.id, {
+                    headers : {
+                        "Authorization" : "Bearer " + token
+                    }
+                }).then(function(response) {
+                    thi_s.photos = response.data.data.photos;
+                }).catch(err => {
+                    console.log(err);
+                });
+            },
+
             editEnterprise() {
+                const token = JSON.parse(window.localStorage.getItem("user")).token;
+
+                const this_ = this;
+
                 const formData = new FormData();
 
                 formData.append("enterprise_name", this.enterprise_name);
@@ -110,9 +149,6 @@
                     formData.append('files[' + i + ']', this.selectedFiles[i]);
                 }
 
-                const token = JSON.parse(window.localStorage.getItem("user")).token;
-
-                const this_ = this;
 
                 axios.put("/enterprise/edit/" + this.$route.params.id, formData, {
                     headers : {
@@ -157,6 +193,7 @@
                 thi_s.location_name = res.data.location_name;
                 thi_s.longitude = res.data.longitude;
                 thi_s.latitude = res.data.latitude;
+                thi_s.photos = res.data.photos;
             }).catch(function(err) {
                 console.log(err);
             });

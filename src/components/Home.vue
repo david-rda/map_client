@@ -39,7 +39,7 @@
                         <td>{{ item.latitude }}</td>
                         <td class="text-center">
                             <router-link :to="'/edit/' + item.id" class="btn btn-primary">რედაქტირება</router-link>
-                            <button type="button" class="btn btn-danger ms-1" :data-id="item.id">წაშლა</button>
+                            <button type="button" class="btn btn-danger ms-1" :data-id="item.id" @click="deleteEnterprise($event)">წაშლა</button>
                         </td>
                     </tr>
                 </tbody>
@@ -70,7 +70,25 @@
                 }).catch(function(err) {
                     console.log(err);
                 });
-            }
+            },
+
+            deleteEnterprise(event) {
+                const token = JSON.parse(window.localStorage.getItem("user")).token
+
+                const id = event.target.getAttribute("data-id");
+
+                const thi_s = this;
+
+                axios.delete("/enterprise/delete/" + id, {
+                    headers : {
+                        "Authorization" : "Bearer " + token
+                    }
+                }).then(function(response) {
+                    thi_s.data = response.data.data;
+                }).catch(err => {
+                    console.log(err);
+                });
+            },
         },
 
         mounted() {
