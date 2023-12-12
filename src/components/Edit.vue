@@ -150,7 +150,7 @@
                 }
 
 
-                axios.put("/enterprise/edit/" + this.$route.params.id, formData, {
+                axios.post("/enterprise/edit/" + this.$route.params.id, formData, {
                     headers : {
                         "Authorization" : "Bearer " + token
                     }

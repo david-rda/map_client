@@ -76,11 +76,35 @@
                         title: location.enterprise_name
                     });
 
-                    const images = location.photos.map(photo => `<img src="http://localhost:8000/images/${photo.name}" alt="${location.name}" style="max-width:200px;"/>`).join('');
+                    const images = location.photos.map((photo, index) => {
+                        const isActive = index === 0 ? 'active' : '';
+                        return `<div class="carousel-item ${isActive}">
+                                    <img src="http://localhost:8000/images/${photo.name}" class="d-block " style="max-height:200px"/>
+                                </div>`;
+                    }).join('');
+
+                    const indicators = location.photos.map((photo, index) => {
+                        const isActive = index === 0 ? 'active' : ''; // Set the first indicator as active
+                        return `<button type="button" data-bs-target="#carouselExample" data-bs-slide-to="${index}" class="${isActive}" aria-current="${isActive ? 'true' : 'false'}" aria-label="Slide ${index + 1}"></button>`;
+                    }).join('');
 
                     const contentString = `
-                        <div style='padding:6px'>
-                            <div class="gallery mb-3">${images}</div>
+                        <div style='padding:6px;max-width:300px' id='bl'>
+                            <div id="carouselExample" class="carousel slide">
+                                <div class="carousel-indicators">
+                                    ${indicators}
+                                </div>
+                                <div class="carousel-inner">
+                                    ${images}
+                                </div>
+
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon"></span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon"></span>
+                                </button>
+                            </div>
                             <p class='text-success'>${location.enterprise_name}</p>
                             <p><span style='font-weight:bold'>დარგი:&nbsp;</span> ${location.enterprise_field}</p>
                             <p>${location.location_name}</p>
