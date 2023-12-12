@@ -1,50 +1,46 @@
 <template>
     <div>
-        <div class="container-fluid">
-            <div class="row p-3 justify-content-end">
-                <div class="col-1">
-                    <button type="button" @click="signout" class="btn btn-danger">გასვლა</button>
-                </div>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container">
+                <router-link to="/home" class="navbar-brand">მთავარი</router-link>
+
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <router-link to="/add" class="nav-link">საწარმოს დამატება</router-link>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav ms-auto">
+                    <button type="button" @click="signout()" class="btn btn-danger ms-auto">გასვლა</button>
+                </ul>
             </div>
+        </nav>
 
-            <div class="row justify-content-center mt-5">
-                <div class="col-4">
-                    <form method="POST" @submit.prevent="addEnterprise()">
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <input type="text" placeholder="გრძედი" class="form-control" v-model="longitude">
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <input type="text" placeholder="განედი" class="form-control" v-model="latitude">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group mb-3">
-                            <input type="text" placeholder="საწარმოს დასახელება" class="form-control" v-model="enterprise_name">
-                        </div>
-                        <div class="form-group mb-3">
-                            <input type="text" placeholder="ლოკაციის დასახელება" class="form-control" v-model="location_name">
-                        </div>
-                        <div class="form-group mb-3">
-                            <input type="text" placeholder="დარგი" class="form-control" v-model="enterprise_field">
-                        </div>
-                        <div class="form-group d-grid">
-                            <input type="submit" class="btn btn-success" value="საწარმოს დამატება">
-                        </div>
-
-                        <div class="alert alert-success mt-3" v-if="message == '1'">
-                            <strong>საწარმო დაემატა</strong>
-                        </div>
-
-                        <div class="alert alert-danger mt-3" v-if="message == '0'">
-                            <strong>საწარმო ვერ დაემატა</strong>
-                        </div>
-                    </form>
-                </div>
-            </div>
+        <div id="app" class="container mt-5">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>საწარმოს დასახელება</th>
+                        <th>დარგი</th>
+                        <th>ლოკაციის დასახელება</th>
+                        <th>გრძედი</th>
+                        <th>განედი</th>
+                        <th>ქმედება</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(item, index) in data" :key="index">
+                        <th>{{ item.id }}</th>
+                        <td>{{ item.enterprise_name }}</td>
+                        <td>{{ item.enterprise_field }}</td>
+                        <td>{{ item.location_name }}</td>
+                        <td>{{ item.longitude }}</td>
+                        <td>{{ item.latitude }}</td>
+                        <td><router-link :to="'/edit/' + item.id" class="btn btn-primary">რედაქტირება</router-link></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </template>
@@ -57,12 +53,7 @@
 
         data() {
             return {
-                enterprise_name : "",
-                enterprise_field : "",
-                location_name : "",
-                longitude : "",
-                latitude : "",
-                message : ""
+                data : []
             }
         },
 
@@ -76,57 +67,32 @@
                 }).catch(function(err) {
                     console.log(err);
                 });
-            },
-
-            addEnterprise() {
-                const token = JSON.parse(window.localStorage.getItem("user")).token;
-
-                const this_ = this;
-
-                axios.post("/enterprise/add", {
-                    enterprise_name : this.enterprise_name,
-                    enterprise_field : this.enterprise_field,
-                    location_name : this.location_name,
-                    longitude : this.longitude,
-                    latitude : this.latitude
-                }, {
-                    headers : {
-                        "Authorization" : "Bearer " + token
-                    }
-                }).then(function() {
-                    this_.enterprise_name = "";
-                    this_.enterprise_field = "";
-                    this_.location_name = "";
-                    this_.longitude = "";
-                    this_.latitude = "";
-
-                    this_.message = '1';
-
-                    setTimeout(() => {
-                        this_.message = "";
-                    }, 3000);
-                }).catch(function(err) {
-                    console.log(err);
-                    this_.message = '0';
-
-                    setTimeout(() => {
-                        this_.message = "";
-                    }, 3000);
-                });
             }
         },
 
         mounted() {
-            document.title = "საწარმოების რუკა";
-
             const data = window.localStorage.getItem("user");
             const thi_s = this;
+
+            const token = JSON.parse(window.localStorage.getItem("user")).token;
             
             if(JSON.parse(data)) {
                 thi_s.$router.push({ path: "/home"});
             }else {
                 thi_s.$router.push({ path : "/signin"});
             }
+
+            axios.get("/enterprise/list", {
+                headers : {
+                    "Authorization" : "Bearer " + token
+                }
+            }).then(function(res) {
+                thi_s.data = res.data;
+
+                console.log(res.data)
+            }).catch(function(Err) {
+                console.log(Err);
+            });
         }
     }
 </script>

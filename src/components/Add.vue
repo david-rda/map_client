@@ -19,7 +19,7 @@
 
             <div class="row justify-content-center mt-5">
                 <div class="col-4">
-                    <form method="POST" @submit.prevent="editEnterprise()">
+                    <form method="POST" @submit.prevent="addEnterprise()">
                         <div class="row mb-3">
                             <div class="col-6">
                                 <div class="form-group">
@@ -38,19 +38,21 @@
                         <div class="form-group mb-3">
                             <input type="text" placeholder="ლოკაციის დასახელება" class="form-control" v-model="location_name">
                         </div>
+
                         <div class="form-group mb-3">
                             <input type="text" placeholder="დარგი" class="form-control" v-model="enterprise_field">
                         </div>
+
                         <div class="form-group d-grid">
-                            <input type="submit" class="btn btn-success" value="დარედაქტირება">
+                            <input type="submit" class="btn btn-success" value="საწარმოს დამატება">
                         </div>
 
                         <div class="alert alert-success mt-3" v-if="message == '1'">
-                            <strong>საწარმო დარედაქტირდა</strong>
+                            <strong>საწარმო დაემატა</strong>
                         </div>
 
                         <div class="alert alert-danger mt-3" v-if="message == '0'">
-                            <strong>საწარმო ვერ დარედაქტირდა</strong>
+                            <strong>საწარმო ვერ დაემატა</strong>
                         </div>
                     </form>
                 </div>
@@ -72,8 +74,7 @@
                 location_name : "",
                 longitude : "",
                 latitude : "",
-
-                message : ""
+                message : "",
             }
         },
 
@@ -89,12 +90,12 @@
                 });
             },
 
-            editEnterprise() {
+            addEnterprise() {
                 const token = JSON.parse(window.localStorage.getItem("user")).token;
 
                 const this_ = this;
 
-                axios.put("/enterprise/edit/" + this.$route.params.id, {
+                axios.post("/enterprise/add", {
                     enterprise_name : this.enterprise_name,
                     enterprise_field : this.enterprise_field,
                     location_name : this.location_name,
@@ -105,6 +106,12 @@
                         "Authorization" : "Bearer " + token
                     }
                 }).then(function() {
+                    this_.enterprise_name = "";
+                    this_.enterprise_field = "";
+                    this_.location_name = "";
+                    this_.longitude = "";
+                    this_.latitude = "";
+
                     this_.message = '1';
 
                     setTimeout(() => {
@@ -124,28 +131,12 @@
         mounted() {
             const data = window.localStorage.getItem("user");
             const thi_s = this;
-
-            const token = JSON.parse(window.localStorage.getItem("user")).token;
             
             if(JSON.parse(data)) {
-                thi_s.$router.push({ path: "/edit/" + thi_s.$route.params.id});
+                thi_s.$router.push({ path: "/add"});
             }else {
                 thi_s.$router.push({ path : "/signin"});
             }
-
-            axios.get("/enterprise/get/" + thi_s.$route.params.id, {
-                headers : {
-                    "Authorization" : "Bearer " + token
-                }
-            }).then(function(res) {
-                thi_s.enterprise_name = res.data.enterprise_name;
-                thi_s.enterprise_field = res.data.enterprise_field;
-                thi_s.location_name = res.data.location_name;
-                thi_s.longitude = res.data.longitude;
-                thi_s.latitude = res.data.latitude;
-            }).catch(function(Err) {
-                console.log(Err);
-            });
         }
     }
 </script>
