@@ -26,7 +26,7 @@
                         <th>ლოკაციის დასახელება</th>
                         <th>გრძედი</th>
                         <th>განედი</th>
-                        <th>ქმედება</th>
+                        <th class="text-center">ქმედება</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -37,7 +37,10 @@
                         <td>{{ item.location_name }}</td>
                         <td>{{ item.longitude }}</td>
                         <td>{{ item.latitude }}</td>
-                        <td><router-link :to="'/edit/' + item.id" class="btn btn-primary">რედაქტირება</router-link></td>
+                        <td class="text-center">
+                            <router-link :to="'/edit/' + item.id" class="btn btn-primary">რედაქტირება</router-link>
+                            <button type="button" class="btn btn-danger ms-1" :data-id="item.id">წაშლა</button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
