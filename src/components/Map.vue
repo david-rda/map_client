@@ -76,12 +76,11 @@
                         title: location.enterprise_name
                     });
 
-                    // const images = location.additionalPhotos.map(photo => `<img src="${photo}" alt="${location.name}" style="max-width:200px;"/>`).join('');
-
-                    // <div class="gallery">${images}</div>
+                    const images = location.photos.map(photo => `<img src="http://localhost:8000/images/${photo.name}" alt="${location.name}" style="max-width:200px;"/>`).join('');
 
                     const contentString = `
                         <div style='padding:6px'>
+                            <div class="gallery mb-3">${images}</div>
                             <p class='text-success'>${location.enterprise_name}</p>
                             <p><span style='font-weight:bold'>დარგი:&nbsp;</span> ${location.enterprise_field}</p>
                             <p>${location.location_name}</p>

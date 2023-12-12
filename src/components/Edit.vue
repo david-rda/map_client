@@ -23,23 +23,26 @@
                         <div class="row mb-3">
                             <div class="col-6">
                                 <div class="form-group">
-                                    <input type="text" placeholder="გრძედი" class="form-control" v-model="longitude">
+                                    <input type="text" placeholder="გრძედი" class="form-control" v-model="this.longitude">
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="form-group">
-                                    <input type="text" placeholder="განედი" class="form-control" v-model="latitude">
+                                    <input type="text" placeholder="განედი" class="form-control" v-model="this.latitude">
                                 </div>
                             </div>
                         </div>
                         <div class="form-group mb-3">
-                            <input type="text" placeholder="საწარმოს დასახელება" class="form-control" v-model="enterprise_name">
+                            <input type="text" placeholder="საწარმოს დასახელება" class="form-control" v-model="this.enterprise_name">
                         </div>
                         <div class="form-group mb-3">
-                            <input type="text" placeholder="ლოკაციის დასახელება" class="form-control" v-model="location_name">
+                            <input type="text" placeholder="ლოკაციის დასახელება" class="form-control" v-model="this.location_name">
                         </div>
                         <div class="form-group mb-3">
-                            <input type="text" placeholder="დარგი" class="form-control" v-model="enterprise_field">
+                            <input type="text" placeholder="დარგი" class="form-control" v-model="this.enterprise_field">
+                        </div>
+                        <div class="form-group mb-3">
+                            <input type="file" class="form-control" id="files" @change="handleFileUpload" multiple />
                         </div>
                         <div class="form-group d-grid">
                             <input type="submit" class="btn btn-success" value="დარედაქტირება">
@@ -63,7 +66,7 @@
     import axios from "axios";
 
     export default {
-        name : "AddEnterprise",
+        name : "EditEnterprise",
 
         data() {
             return {
@@ -72,12 +75,17 @@
                 location_name : "",
                 longitude : "",
                 latitude : "",
+                selectedFiles: [],
 
                 message : ""
             }
         },
 
         methods : {
+            handleFileUpload(event) {
+                this.selectedFiles = event.target.files;
+            },
+
             signout() {
                 const thi_s = this;
                 axios.post("/signout").then(function() {
@@ -90,17 +98,23 @@
             },
 
             editEnterprise() {
+                const formData = new FormData();
+
+                formData.append("enterprise_name", this.enterprise_name);
+                formData.append("enterprise_field", this.enterprise_field);
+                formData.append("location_name", this.location_name);
+                formData.append("longitude", this.longitude);
+                formData.append("latitude", this.latitude);
+                
+                for (let i = 0; i < this.selectedFiles.length; i++) {
+                    formData.append('files[' + i + ']', this.selectedFiles[i]);
+                }
+
                 const token = JSON.parse(window.localStorage.getItem("user")).token;
 
                 const this_ = this;
 
-                axios.put("/enterprise/edit/" + this.$route.params.id, {
-                    enterprise_name : this.enterprise_name,
-                    enterprise_field : this.enterprise_field,
-                    location_name : this.location_name,
-                    longitude : this.longitude,
-                    latitude : this.latitude
-                }, {
+                axios.put("/enterprise/edit/" + this.$route.params.id, formData, {
                     headers : {
                         "Authorization" : "Bearer " + token
                     }
@@ -143,8 +157,8 @@
                 thi_s.location_name = res.data.location_name;
                 thi_s.longitude = res.data.longitude;
                 thi_s.latitude = res.data.latitude;
-            }).catch(function(Err) {
-                console.log(Err);
+            }).catch(function(err) {
+                console.log(err);
             });
         }
     }

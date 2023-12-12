@@ -43,6 +43,10 @@
                             <input type="text" placeholder="დარგი" class="form-control" v-model="enterprise_field">
                         </div>
 
+                        <div class="form-group mb-3">
+                            <input type="file" class="form-control" id="files" @change="handleFileUpload" multiple />
+                        </div>
+
                         <div class="form-group d-grid">
                             <input type="submit" class="btn btn-success" value="საწარმოს დამატება">
                         </div>
@@ -75,10 +79,16 @@
                 longitude : "",
                 latitude : "",
                 message : "",
+
+                selectedFiles: [],
             }
         },
 
         methods : {
+            handleFileUpload(event) {
+                this.selectedFiles = Array.from(event.target.files);
+            },
+
             signout() {
                 const thi_s = this;
                 axios.post("/signout").then(function() {
@@ -95,13 +105,19 @@
 
                 const this_ = this;
 
-                axios.post("/enterprise/add", {
-                    enterprise_name : this.enterprise_name,
-                    enterprise_field : this.enterprise_field,
-                    location_name : this.location_name,
-                    longitude : this.longitude,
-                    latitude : this.latitude
-                }, {
+                const formData = new FormData();
+
+                formData.append("enterprise_name", this.enterprise_name);
+                formData.append("enterprise_field", this.enterprise_field);
+                formData.append("location_name", this.location_name);
+                formData.append("longitude", this.longitude);
+                formData.append("latitude", this.latitude);
+
+                for (let i = 0; i < this.selectedFiles.length; i++) {
+                    formData.append('files[' + i + ']', this.selectedFiles[i]);
+                }
+
+                axios.post("/enterprise/add", formData, {
                     headers : {
                         "Authorization" : "Bearer " + token
                     }
@@ -112,13 +128,14 @@
                     this_.longitude = "";
                     this_.latitude = "";
 
+                    this_.selectedFiles = null;
+
                     this_.message = '1';
 
                     setTimeout(() => {
                         this_.message = "";
                     }, 3000);
-                }).catch(function(err) {
-                    console.log(err);
+                }).catch(function() {
                     this_.message = '0';
 
                     setTimeout(() => {
