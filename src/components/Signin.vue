@@ -1,14 +1,18 @@
 <template>
-    <div class="container" style="margin-top: 10%">
+    <div class="container" style="margin-top: 5%">
         <div class="row justify-content-center">
-            <div class="col-6">
+            <div class="col-lg-6 col-md-6 col-xs-12 col-sm-12">
+                <div class="header-logo">
+                    <img src="../assets/images/rda-logo-t.88318a3d.png" />
+                </div>
+
                 <form method="POST" @submit.prevent="signin()">
                     <div class="form-group mb-3">
-                        <label class="form-label">ელ.ფოსტა</label>
+                        <label class="mb-0">ელ.ფოსტა</label>
                         <input type="email" name="email" id="email" v-model="email" class="form-control" placeholder="ელ.ფოსტა">
                     </div>
                     <div class="form-group mb-3">
-                        <label class="form-label">პაროლი</label>
+                        <label class="mb-0">პაროლი</label>
                         <input type="password" name="password" id="password" v-model="password" class="form-control" placeholder="პაროლი">
                     </div>
                     <div class="form-group d-grid">

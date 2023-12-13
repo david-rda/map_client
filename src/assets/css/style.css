@@ -1,3 +1,49 @@
 html, body {
     background-color: #f3f3f3;
 }
+
+.header-logo {
+    width: 100% !important;
+    display: flex;
+    justify-content: center;
+    margin-top: 100px;
+}
+
+.header-logo > img {
+    height: 100px;
+    margin-left: 40px !important;
+}
+
+input[type="email"], input[type="password"], input[type="text"] {
+    height: 55px;
+    padding: 0 15px;
+    background-color: #ffffff;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    outline: none;
+    margin-top: 10px;
+    box-shadow: none !important;
+}
+
+.form-control:focus {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+input[type="submit"] {
+    height: 55px;
+    padding: 0 15px;
+    border: none;
+    color: #005019;
+    background-color: #82be00;
+    text-transform: uppercase;
+    font-weight: 900;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 20px;
+}
+
+input[type="submit"]:hover {
+    background-color: #005019;
+    color: #fff;
+}

@@ -3,7 +3,7 @@
         <div class="container-fluid">
             <nav class="navbar navbar-expand-lg bg-body-tertiary">
                 <div class="container">
-                    <router-link to="/home" class="navbar-brand">მთავარი</router-link>
+                    <router-link to="/home" class="navbar-brand"><img src="../assets/images/rda-logo-t.88318a3d.png" width="120px" /></router-link>
 
                     <ul class="navbar-nav">
                         <li class="nav-item">
