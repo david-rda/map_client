@@ -1,79 +1,87 @@
 <template>
     <div>
-        <div class="container-fluid">
+        <!-- <div class="container-fluid"> -->
             <nav class="navbar navbar-expand-lg bg-body-tertiary">
                 <div class="container">
                     <router-link to="/home" class="navbar-brand"><img src="../assets/images/rda-logo-t.88318a3d.png" width="120px" /></router-link>
 
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <router-link to="/add" class="nav-link">საწარმოს დამატება</router-link>
-                        </li>
-                    </ul>
+                    <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
 
-                    <ul class="navbar-nav ms-auto">
-                        <button type="button" @click="signout" class="btn btn-danger ms-auto">გასვლა</button>
-                    </ul>
+                    <div class="collapse navbar-collapse" id="nav">
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <router-link to="/add" class="nav-link">საწარმოს დამატება</router-link>
+                            </li>
+                        </ul>
+
+                        <ul class="navbar-nav ms-auto">
+                            <button type="button" @click="signout()" class="btn btn-danger">გასვლა</button>
+                        </ul>
+                    </div>
                 </div>
             </nav>
 
-            <div class="row justify-content-center mt-5">
-                <div class="col-4">
-                    <form method="POST" @submit.prevent="editEnterprise()">
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <input type="text" placeholder="გრძედი" class="form-control" v-model="this.longitude">
+            <div class="container">
+                <div class="row justify-content-center mt-5">
+                    <div class="col-md-6 col-12">
+                        <form method="POST" @submit.prevent="editEnterprise()">
+                            <div class="row">
+                                <div class="col-md-6 col-12">
+                                    <div class="form-group">
+                                        <input type="text" placeholder="გრძედი" class="form-control" v-model="this.longitude">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-12">
+                                    <div class="form-group">
+                                        <input type="text" placeholder="განედი" class="form-control" v-model="this.latitude">
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <input type="text" placeholder="განედი" class="form-control" v-model="this.latitude">
+                            <div class="form-group mb-3">
+                                <input type="text" placeholder="საწარმოს დასახელება" class="form-control" v-model="this.enterprise_name">
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="text" placeholder="ლოკაციის დასახელება" class="form-control" v-model="this.location_name">
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="text" placeholder="დარგი" class="form-control" v-model="this.enterprise_field">
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="file" class="form-control" id="files" @change="handleFileUpload" multiple />
+                            </div>
+
+                            <div class="border rounded mb-2 p-2 col-12 overflow-scroll" v-for="data in this.photos" :key="data.id">
+                                <div class="d-flex justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        <p>
+                                            <img :src="'http://localhost:8000/images/' + data.name" class="img-thumbnail" style="width:50px;height:50px">
+                                            {{ data.name }}
+                                        </p>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <button type="button" :data-id="data.id" class="btn btn-danger" @click="deletePhoto($event)">წაშლა</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="form-group mb-3">
-                            <input type="text" placeholder="საწარმოს დასახელება" class="form-control" v-model="this.enterprise_name">
-                        </div>
-                        <div class="form-group mb-3">
-                            <input type="text" placeholder="ლოკაციის დასახელება" class="form-control" v-model="this.location_name">
-                        </div>
-                        <div class="form-group mb-3">
-                            <input type="text" placeholder="დარგი" class="form-control" v-model="this.enterprise_field">
-                        </div>
-                        <div class="form-group mb-3">
-                            <input type="file" class="form-control" id="files" @change="handleFileUpload" multiple />
-                        </div>
 
-                        <div class="border rounded mb-2 p-2" v-for="data in this.photos" :key="data.id">
-                            <div class="d-flex justify-content-between">
-                                <div class="d-flex align-items-center">
-                                    <p>
-                                        <img :src="'http://localhost:8000/images/' + data.name" class="img-thumbnail" style="width:50px;height:50px">
-                                        {{ data.name }}
-                                    </p>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <button type="button" :data-id="data.id" class="btn btn-danger" @click="deletePhoto($event)">წაშლა</button>
-                                </div>
+                            <div class="form-group d-grid">
+                                <input type="submit" class="btn btn-success" value="დარედაქტირება">
                             </div>
-                        </div>
 
-                        <div class="form-group d-grid">
-                            <input type="submit" class="btn btn-success" value="დარედაქტირება">
-                        </div>
+                            <div class="alert alert-success mt-3" v-if="message == '1'">
+                                <strong>საწარმო დარედაქტირდა</strong>
+                            </div>
 
-                        <div class="alert alert-success mt-3" v-if="message == '1'">
-                            <strong>საწარმო დარედაქტირდა</strong>
-                        </div>
-
-                        <div class="alert alert-danger mt-3" v-if="message == '0'">
-                            <strong>საწარმო ვერ დარედაქტირდა</strong>
-                        </div>
-                    </form>
+                            <div class="alert alert-danger mt-3" v-if="message == '0'">
+                                <strong>საწარმო ვერ დარედაქტირდა</strong>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
+        <!-- </div> -->
     </div>
 </template>
 

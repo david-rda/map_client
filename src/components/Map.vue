@@ -50,14 +50,8 @@
         
         methods: {
             async fetchLocations() {
-                const token = JSON.parse(window.localStorage.getItem("user")).token;
-
                 try {
-                    const response = await axios.get('/enterprise/list', {
-                        headers : {
-                            "Authorization" : "Bearer " + token
-                        }
-                    });
+                    const response = await axios.get('/enterprise/list');
 
                     this.locations = response.data;
 
@@ -71,19 +65,13 @@
             },
 
             searchEnterprise(event) {
-                const token = JSON.parse(window.localStorage.getItem("user")).token;
-
                 const thi_s = this;
 
                 if(event.target.value == 0) {
                     this.showsearch = 0;
                 }
 
-                axios.post("/enterprise/search", { value : event.target.value }, {
-                    headers : {
-                        "Authorization" : "Bearer " + token
-                    }
-                }).then(function(response) {
+                axios.post("/enterprise/search", { value : event.target.value }).then(function(response) {
                     thi_s.search_data = response.data;
                     thi_s.showsearch = 1;
                 }).catch(function(err) {

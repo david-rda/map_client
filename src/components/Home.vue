@@ -4,19 +4,25 @@
             <div class="container">
                 <router-link to="/home" class="navbar-brand"><img src="../assets/images/rda-logo-t.88318a3d.png" width="120px" /></router-link>
 
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <router-link to="/add" class="nav-link">საწარმოს დამატება</router-link>
-                    </li>
-                </ul>
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-                <ul class="navbar-nav ms-auto">
-                    <button type="button" @click="signout()" class="btn btn-danger ms-auto">გასვლა</button>
-                </ul>
+                <div class="collapse navbar-collapse" id="nav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <router-link to="/add" class="nav-link">საწარმოს დამატება</router-link>
+                        </li>
+                    </ul>
+
+                    <ul class="navbar-nav ms-auto">
+                        <button type="button" @click="signout()" class="btn btn-danger">გასვლა</button>
+                    </ul>
+                </div>
             </div>
         </nav>
 
-        <div id="app" class="container mt-5">
+        <div id="app" class="container mt-5 table-responsive">
             <table class="table">
                 <thead>
                     <tr>
