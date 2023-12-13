@@ -8,11 +8,11 @@
 
                 <form method="POST" @submit.prevent="signin()">
                     <div class="form-group mb-3">
-                        <label class="mb-0">ელ.ფოსტა</label>
+                        <label class="mb-0" for="email"><strong>ელ.ფოსტა</strong></label>
                         <input type="email" name="email" id="email" v-model="email" class="form-control" placeholder="ელ.ფოსტა">
                     </div>
                     <div class="form-group mb-3">
-                        <label class="mb-0">პაროლი</label>
+                        <label class="mb-0" for="password"><strong>პაროლი</strong></label>
                         <input type="password" name="password" id="password" v-model="password" class="form-control" placeholder="პაროლი">
                     </div>
                     <div class="form-group d-grid">
@@ -21,6 +21,8 @@
                 </form>
             </div>
         </div>
+
+        <p class="disabled text-center text-muted mt-3" style="user-select:none">©&nbsp;2022&nbsp; - 2023&nbsp;Created&nbsp;by&nbsp;<strong>RDA</strong>&nbsp;IT&nbsp;team</p>
     </div>
 </template>
 

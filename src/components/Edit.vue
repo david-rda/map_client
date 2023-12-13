@@ -23,7 +23,7 @@
                 </div>
             </nav>
 
-            <div class="container">
+            <div class="container mb-5">
                 <div class="row justify-content-center mt-5">
                     <div class="col-md-6 col-12">
                         <form method="POST" @submit.prevent="editEnterprise()">
@@ -52,19 +52,16 @@
                                 <input type="file" class="form-control" id="files" @change="handleFileUpload" multiple />
                             </div>
 
-                            <div class="border rounded mb-2 p-2 col-12 overflow-scroll" v-for="data in this.photos" :key="data.id">
-                                <div class="d-flex justify-content-between">
-                                    <div class="d-flex align-items-center">
-                                        <p>
-                                            <img :src="'http://localhost:8000/images/' + data.name" class="img-thumbnail" style="width:50px;height:50px">
-                                            {{ data.name }}
-                                        </p>
+                            <ul class="list-group mb-2 overflow-auto">
+                                <li class="list-group-item d-flex justify-content-between overflow-auto" v-for="data in this.photos" :key="data.id">
+                                    <div>
+                                        <img :src="'http://localhost:8000/images/' + data.name" class="img-thumbnail" style="width:50px;height:50px">
+                                        <span class="ms-1">{{ data.name }}</span>
                                     </div>
-                                    <div class="d-flex align-items-center">
-                                        <button type="button" :data-id="data.id" class="btn btn-danger" @click="deletePhoto($event)">წაშლა</button>
-                                    </div>
-                                </div>
-                            </div>
+
+                                    <button type="button" :data-id="data.id" class="btn btn-danger" @click="deletePhoto($event)">წაშლა</button>
+                                </li>
+                            </ul>
 
                             <div class="form-group d-grid">
                                 <input type="submit" class="btn btn-success" value="დარედაქტირება">
