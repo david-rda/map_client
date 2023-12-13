@@ -21,7 +21,7 @@
                 <a href="https://www.facebook.com/rda.gov.ge" class="text-white ms-3 nav-link d-inline-block" style="font-size: 12px">RDA - facebook</a>
             </div>
 
-            <div class="d-flex float-end">
+            <div class="d-flex float-end" id="texts">
                 <span class="text-white nav-link d-inline-block" style="font-size: 12px">ცხელი ხაზი - 1501</span>
                 <span class="text-white nav-link d-inline-block ms-3" style="font-size: 12px">info@rda.gov.ge</span>
             </div>
@@ -95,8 +95,6 @@
             getCoords(event) {
                 const latitude = parseFloat(event.target.getAttribute("data-latitude"));
                 const longitude = parseFloat(event.target.getAttribute("data-longitude"));
-
-                // const thi_s = this;
 
                 const infoWindow = new window.google.maps.InfoWindow();
 
@@ -215,3 +213,11 @@
         }
     };
 </script>
+
+<style scoped>
+    @media screen and (max-width: 768px) {
+        #texts {
+            float: left !important;
+        }
+    }
+</style>
