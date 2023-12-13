@@ -2,6 +2,17 @@
   <div>
     <div ref="map" style="height: 100vh;"></div>
 
+    <div class="position-fixed z-2 top-0 end-0" style="margin-right:70px;margin-top:10px">
+        <input type="search" placeholder="საწარმოს ძებნა..." class="form-control" style="width:300px" @keyup="searchEnterprise($event)">
+
+        <div class="bg-white p-2 mt-1" v-if="this.showsearch == 1" id="search_block" style="width:300px;cursor:pointer">
+            <div class="border rounded p-1" v-for="data in this.search_data" :data-longitude="data.longitude" :data-latitude="data.latitude" :key="data.id" @click="getCoords($event)">
+                <p class="text-success m-0" style="font-size: 13px;pointer-events:none">{{ data.enterprise_name }}</p>
+                <p class="text-muted m-0" style="font-size: 13px;pointer-events:none">{{ data.location_name }}</p>
+            </div>
+        </div>
+    </div>
+
     <div class="bottom-panel bg-success position-absolute p-2 bottom-0 z-2 vw-100">
         <div class="container">
             <div class="d-flex float-start">
@@ -27,7 +38,9 @@
 
         data() {
             return {
-                locations: []
+                locations: [],
+                search_data : [],
+                showsearch : 0
             };
         },
 
@@ -57,6 +70,88 @@
                 }
             },
 
+            searchEnterprise(event) {
+                const token = JSON.parse(window.localStorage.getItem("user")).token;
+
+                const thi_s = this;
+
+                if(event.target.value == 0) {
+                    this.showsearch = 0;
+                }
+
+                axios.post("/enterprise/search", { value : event.target.value }, {
+                    headers : {
+                        "Authorization" : "Bearer " + token
+                    }
+                }).then(function(response) {
+                    thi_s.search_data = response.data;
+                    thi_s.showsearch = 1;
+                }).catch(function(err) {
+                    console.log(err);
+                    thi_s.showsearch = 0;
+                })
+            },
+
+            getCoords(event) {
+                const latitude = parseFloat(event.target.getAttribute("data-latitude"));
+                const longitude = parseFloat(event.target.getAttribute("data-longitude"));
+
+                // const thi_s = this;
+
+                const infoWindow = new window.google.maps.InfoWindow();
+
+                const map = new window.google.maps.Map(this.$refs.map, {
+                    center: { lat: latitude, lng: longitude },
+                    zoom: 15
+                });
+
+                const marker = new window.google.maps.Marker({
+                    position: { lat: latitude, lng: longitude },
+                    map: map,
+                    title: this.search_data.enterprise_name
+                });
+
+                const images = this.search_data[0].photos.map((photo, index) => {
+                        const isActive = index === 0 ? 'active' : '';
+                        return `<div class="carousel-item ${isActive}">
+                                    <img src="http://localhost:8000/images/${photo.name}" class="d-block " style="height:200px"/>
+                                </div>`;
+                    }).join('');
+
+                const indicators = this.search_data[0].photos.map((photo, index) => {
+                    const isActive = index === 0 ? 'active' : ''; // Set the first indicator as active
+                    return `<button type="button" data-bs-target="#carouselExample" data-bs-slide-to="${index}" class="${isActive}" aria-current="${isActive ? 'true' : 'false'}" aria-label="Slide ${index + 1}"></button>`;
+                }).join('');
+
+                const contentString = `
+                    <div style='padding:6px;max-width:300px' id='bl'>
+                        <div id="carouselExample" class="carousel slide mb-1">
+                            <div class="carousel-indicators">
+                                ${indicators}
+                            </div>
+                            <div class="carousel-inner">
+                                ${images}
+                            </div>
+
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon"></span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+                                <span class="carousel-control-next-icon"></span>
+                            </button>
+                        </div>
+                        <p class='text-success'>${this.search_data[0].enterprise_name}</p>
+                        <p><span style='font-weight:bold'>დარგი:&nbsp;</span> ${this.search_data[0].enterprise_field}</p>
+                        <p>${this.search_data[0].location_name}</p>
+                    </div>
+                `;
+
+                marker.addListener('click', () => {
+                    infoWindow.setContent(contentString);
+                    infoWindow.open(map, marker);
+                });
+            },
+
             initializeMap() {
 
                 const map = new window.google.maps.Map(this.$refs.map, {
@@ -79,7 +174,7 @@
                     const images = location.photos.map((photo, index) => {
                         const isActive = index === 0 ? 'active' : '';
                         return `<div class="carousel-item ${isActive}">
-                                    <img src="http://localhost:8000/images/${photo.name}" class="d-block " style="max-height:200px"/>
+                                    <img src="http://localhost:8000/images/${photo.name}" class="d-block " style="height:200px"/>
                                 </div>`;
                     }).join('');
 
@@ -90,7 +185,7 @@
 
                     const contentString = `
                         <div style='padding:6px;max-width:300px' id='bl'>
-                            <div id="carouselExample" class="carousel slide">
+                            <div id="carouselExample" class="carousel slide mb-1">
                                 <div class="carousel-indicators">
                                     ${indicators}
                                 </div>
