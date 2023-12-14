@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div ref="map" style="height: 100vh;"></div>
+    <div ref="map" style="height: 96vh;"></div>
 
     <div class="position-fixed z-2 top-0 end-0" style="margin-right:70px;margin-top:10px">
         <input type="search" placeholder="საწარმოს ძებნა..." class="form-control" style="width:300px" @keyup="searchEnterprise($event)">
@@ -13,8 +13,8 @@
         </div>
     </div>
 
-    <div class="bottom-panel bg-success position-absolute p-2 bottom-0 z-2 vw-100">
-        <div class="container">
+    <div class="bg-success p-2 vw-100" style="height: 4vh;">
+        <div class="container" style="height: 100%;">
             <div class="d-flex float-start">
                 <a href="https://mepa.gov.ge" class="text-white nav-link d-inline-block" style="font-size: 12px">MEPA.GOV.GE</a>
                 <a href="https://www.facebook.com/MEPAGeorgia" class="text-white ms-3 nav-link d-inline-block" style="font-size: 12px">MEPA - facebook</a>
@@ -64,7 +64,7 @@
                 }
             },
 
-            searchEnterprise(event) {
+            async searchEnterprise(event) {
                 const thi_s = this;
 
                 if(event.target.value == 0) {
