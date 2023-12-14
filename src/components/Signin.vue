@@ -43,16 +43,44 @@
             signin() {
                 const thi_s = this;
 
-                axios.post("/signin", {
-                    email : this.email,
-                    password : this.password
-                }).then(function(response) {
-                    window.localStorage.setItem("user", JSON.stringify(response.data));
+                if(this.email.length == 0 || this.email == "") {
+                    this.$swal({
+                        title : "ელ. ფოსტა აუცილებელია",
+                        icon : "warning",
+                        timerProgressBar: true,
+                        timer : 3000,
+                        toast : true,
+                        position : "top-end"
+                    });
 
-                    thi_s.$router.push("/home");
-                }).catch(function(err) {
-                    console.log(err);
-                });
+                }else if(this.password.length == 0 || this.password == "") {
+                    this.$swal({
+                        title : "პაროლი აუცილებელია",
+                        icon : "warning",
+                        timerProgressBar: true,
+                        timer : 3000,
+                        toast : true,
+                        position : "top-end"
+                    });
+                }else {
+                    axios.post("/signin", {
+                        email : this.email,
+                        password : this.password
+                    }).then(function(response) {
+                        window.localStorage.setItem("user", JSON.stringify(response.data));
+
+                        thi_s.$router.push("/home");
+                    }).catch(function() {
+                        thi_s.$swal({
+                            title : "პაროლი ან ელ.ფოსტა არასწორია",
+                            icon : "warning",
+                            timerProgressBar: true,
+                            timer : 3000,
+                            toast : true,
+                            position : "top-end"
+                        });
+                    });
+                }
             }
         },
 
