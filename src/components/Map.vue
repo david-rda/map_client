@@ -6,7 +6,7 @@
         <input type="search" placeholder="საწარმოს ძებნა..." class="form-control" style="width:300px" @keyup="searchEnterprise($event)">
 
         <div class="bg-white p-2 mt-1" v-if="this.showsearch == 1" id="search_block" style="width:300px;cursor:pointer">
-            <div class="border rounded p-1" v-for="data in this.search_data" :data-longitude="data.longitude" :data-latitude="data.latitude" :key="data.id" @click="getCoords($event)">
+            <div class="border rounded p-1 mb-1 overflow-auto" style="max-height:300px" v-for="data in this.search_data" :data-longitude="data.longitude" :data-latitude="data.latitude" :key="data.id" @click="getCoords($event)">
                 <p class="text-success m-0" style="font-size: 13px;pointer-events:none">{{ data.enterprise_name }}</p>
                 <p class="text-muted m-0" style="font-size: 13px;pointer-events:none">{{ data.location_name }}</p>
             </div>
@@ -69,6 +69,19 @@
 
                 if(event.target.value == 0) {
                     this.showsearch = 0;
+
+                    try {
+                        const response = await axios.get('/enterprise/list');
+
+                        this.locations = response.data;
+
+                        console.log(this.locations);
+
+                        this.initializeMap();
+
+                    } catch (error) {
+                        console.error(error);
+                    }
                 }
 
                 axios.post("/enterprise/search", { value : event.target.value }).then(function(response) {
