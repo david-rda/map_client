@@ -55,7 +55,7 @@
                             <ul class="list-group mb-2 overflow-auto">
                                 <li class="list-group-item d-flex justify-content-between overflow-auto" v-for="data in this.photos" :key="data.id">
                                     <div>
-                                        <img :src="'http://localhost:8000/images/' + data.name" class="img-thumbnail" style="width:50px;height:50px">
+                                        <img :src="'http://localhost:8000/images/' + data.name" data-bs-toggle="modal" data-bs-target="#mymodal" :data-path="data.name" v-on:click="expandImage($event)" class="img-thumbnail" style="width:50px;height:50px;cursor:pointer">
                                         <span class="ms-1">{{ data.name }}</span>
                                     </div>
 
@@ -75,6 +75,16 @@
                                 <strong>საწარმო ვერ დარედაქტირდა</strong>
                             </div>
                         </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="mymodal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <img :src="'http://localhost:8000/images/' + this.zoomed_path" class="w-100" />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -99,7 +109,9 @@
 
                 photos : [],
 
-                message : ""
+                message : "",
+
+                zoomed_path : ""
             }
         },
 
@@ -135,6 +147,12 @@
                 }).catch(err => {
                     console.log(err);
                 });
+            },
+
+            expandImage(event) {
+                const path = event.target.getAttribute("data-path");
+
+                this.zoomed_path = path;
             },
 
             editEnterprise() {

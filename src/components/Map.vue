@@ -3,7 +3,7 @@
     <div ref="map" style="height: 96vh;"></div>
 
     <div class="position-fixed z-2 top-0 end-0" style="margin-right:70px;margin-top:10px">
-        <input type="text" placeholder="საწარმოს ძებნა..." class="form-control" style="width:300px" @keyup="searchEnterprise($event)">
+        <input type="search" placeholder="საწარმოს ძებნა..." class="form-control search" style="width:300px" @keyup="searchEnterprise($event)">
 
         <div class="bg-white p-2 mt-1" v-if="this.showsearch == 1" id="search_block" style="width:300px;cursor:pointer">
             <div class="border rounded p-1 mb-1 overflow-auto" style="max-height:300px" v-for="data in this.search_data" :data-longitude="data.longitude" :data-latitude="data.latitude" :key="data.id" @click="getCoords($event)">
