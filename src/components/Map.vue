@@ -13,8 +13,8 @@
         </div>
     </div>
 
-    <div class="bg-success p-2 vw-100" style="height: 4vh;">
-        <div class="container" style="height: 100%;">
+    <div class="bg-success vw-100" style="height:4vh" id="bottom">
+        <div class="container">
             <div class="d-flex float-start">
                 <a href="https://mepa.gov.ge" class="text-white nav-link d-inline-block" style="font-size: 12px">MEPA.GOV.GE</a>
                 <a href="https://www.facebook.com/MEPAGeorgia" class="text-white ms-3 nav-link d-inline-block" style="font-size: 12px">MEPA - facebook</a>
@@ -22,8 +22,12 @@
             </div>
 
             <div class="d-flex float-end" id="texts">
-                <span class="text-white nav-link d-inline-block" style="font-size: 12px">ცხელი ხაზი - 1501</span>
-                <span class="text-white nav-link d-inline-block ms-3" style="font-size: 12px">info@rda.gov.ge</span>
+                <span class="nav-link d-inline-block" style="font-size: 12px">
+                    <a href="tel:1501" class="text-white text-decoration-none">ცხელი ხაზი - 1501</a>
+                </span>
+                <span class="nav-link d-inline-block ms-3" style="font-size: 12px">
+                    <a href="mailto:info@rda.gov.ge" class="text-white text-decoration-none">info@rda.gov.ge</a>
+                </span>
             </div>
         </div>
     </div>
@@ -219,6 +223,12 @@
     @media screen and (max-width: 768px) {
         #texts {
             float: left !important;
+        }
+    }
+
+    @media screen and (min-width: 768px) {
+        #bottom {
+            padding: 6px;
         }
     }
 </style>
