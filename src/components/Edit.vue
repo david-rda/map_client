@@ -100,93 +100,119 @@
 
         data() {
             return {
-                enterprise_name : "",
-                enterprise_field : "",
-                location_name : "",
-                longitude : "",
-                latitude : "",
-                selectedFiles: [],
+                enterprise_name : "", // მოცემულ ცვლადში შეინახება საწარმოს დასახელება
+                enterprise_field : "", // მოცემულ ცვლადში შეინახება საწარმოს საქმიანობის სფერო/დარგი
+                location_name : "", // მოცემულ ცვლადში შეინახება თუ სად მდებარეობს საწარმო
+                longitude : "", // მოცემულ ცვლადში შეინახება საწარმოს კოორდინატი - განედი
+                latitude : "", // მოცემულ ცვლადში შეინახება საწარმოს კოორდინატი - გრძედი
+                selectedFiles: [], // მოცემულ ცვლადში შეინახება საწარმოზე მიმაგრებული სურათების ობიექტები
 
                 photos : [],
 
-                message : "",
+                message : "", // მოცემულ ცვლადში შეინახება მნიშვნელობა, როლის მიხედვითაც მოხდება შეტყობინების გამოტანა
+                // დარედაქტირდა თუ ვერა საწარმოს მონაცემები
 
-                zoomed_path : ""
+                zoomed_path : "" // მოცემულ ცვლადში შეინახება იმ სურათის დასახელება, რომელზეც მოხდება ხდომილება
             }
         },
 
         methods : {
+            // მოცემული მეთოდის დახმარებით ხდება ატვირთული ფაილების ობიექტების შენახვა selectedFiles ცვლადში
             handleFileUpload(event) {
                 this.selectedFiles = Array.from(event.target.files);
             },
 
+            // მოცემული მეთოდის დახმარებით ხდება სისტემიდან გამოსვლა
             signout() {
                 const thi_s = this;
+                
+                // კონკრეტულ მისამართზე გაიგზავნე ა მოთხოვნა და API მოახდენს მომხმარებლის სისტემიდან გამოსვლას
                 axios.post("/signout").then(function() {
-                    window.localStorage.clear();
+                    window.localStorage.clear(); // localstorage საცავის გასუფთავება შენახული მონაცემებისგან
 
-                    thi_s.$router.push({ path : "/signin"});
+                    thi_s.$router.push({ path : "/signin"}); // გადამისამართება ავტორიცაზიის გვერდზე
                 }).catch(function(err) {
+                    /**
+                     * თუ სისტემიდან გამოსვლა ვერ მოხერხდა და დაფიქსირდა შეცდომა, მაშინ
+                     * კონსოლში დაიბეჭდება შესაბამისი შეტყობინება
+                     */
                     console.log(err);
                 });
             },
 
+            // მოცემული მეთოდის დახმარებით ხდება ფოტოს წაშლა, რომლის მოთხოვნაც გაიგზავნება API-ზე
             deletePhoto(event) {
-                const token = JSON.parse(window.localStorage.getItem("user")).token
+                const token = JSON.parse(window.localStorage.getItem("user")).token // ავტორიზირებული მომხმარებლის ტოკენი
 
+                // ამ ცვლადში შეინახება იმ ფოტოს აიდი, რომლის წაშლის ღილაკზეც მოხდება დაკლიკება
                 const id = event.target.getAttribute("data-id");
 
                 const thi_s = this;
 
+                // API-ზე მოხდება მოთხოვნის გაგზავნა, რომელიც მოახდენს ფოტოს წაშლას ბაზიდან
                 axios.delete("/enterprise/delete/photo/" + id + "/" + this.$route.params.id, {
                     headers : {
                         "Authorization" : "Bearer " + token
                     }
                 }).then(function(response) {
+                    /**
+                     * თუ ფოტო წაიშალა დააბრუნებს განახლებულ რაოდენობას ფოტოებისას
+                     * კონკრეტული საწარმოსთვის და შეინახება მონაცემები photos ცვლადში
+                     */
                     thi_s.photos = response.data.data.photos;
                 }).catch(err => {
+                    /**
+                     * თუ ფოტოს წაშლა ვერ მოხერხდა და დაფიქსირდა შეცდომა, მაშინ
+                     * კონსოლში დაიბეჭდება შესაბამისი შეტყობინება
+                     */
                     console.log(err);
                 });
             },
 
+            // ფოტოს გადიდებისათვის საჭირო მეთოდი
             expandImage(event) {
+                // მოცემულ ცვლადში შეინახება იმ ფოტოს დასახელება, რომელზეც მოხდება დაკლიკება
                 const path = event.target.getAttribute("data-path");
 
-                this.zoomed_path = path;
+                this.zoomed_path = path; // zoomed_path ცვლადში კი მოხდება სახელის შენახვა
             },
 
+            // მოცემული მეთოდის საშუალებით მოხდება საწარმოს დარედაქტირება
             editEnterprise() {
-                const token = JSON.parse(window.localStorage.getItem("user")).token;
+                const token = JSON.parse(window.localStorage.getItem("user")).token; // ავტორიზირებული მომხმარებლის ტოკენი
 
                 const this_ = this;
 
-                const formData = new FormData();
+                const formData = new FormData(); // ფორმის ობიექტი, რომელშიც შეინახება ველებში შეყვანილი ინფორმაციები
 
-                formData.append("enterprise_name", this.enterprise_name);
-                formData.append("enterprise_field", this.enterprise_field);
-                formData.append("location_name", this.location_name);
-                formData.append("longitude", this.longitude);
-                formData.append("latitude", this.latitude);
+                formData.append("enterprise_name", this.enterprise_name); // ფორმის ობიექტში ხდება საწარმოს სახელის შენახვა
+                formData.append("enterprise_field", this.enterprise_field); // ფორმის ობიექტში ხდება საწარმოს დარგის შენახვა
+                formData.append("location_name", this.location_name); // ფორმის ობიექტში ხდება საწარმოს ადგილმდებარეობის
+                formData.append("longitude", this.longitude); // ფორმის ობიექტში ხდება საწარმოს კოორდინატი - გრძედის შენახვა
+                formData.append("latitude", this.latitude); // ფორმის ობიექტში ხდება საწარმოს კოორდინატი - განედის შენახვა
                 
+                // ფორბის ობიექტში ხდება ცვლადში შენახული ფაილების შენახვა
                 for (let i = 0; i < this.selectedFiles.length; i++) {
                     formData.append('files[' + i + ']', this.selectedFiles[i]);
                 }
 
-
+                // API-ზე მოხდება მოთხოვნის გაგზავნა, რათა მოხდეს მონაცემთა დადასტურება და შეცვლა ბაზაში
                 axios.post("/enterprise/edit/" + this.$route.params.id, formData, {
                     headers : {
                         "Authorization" : "Bearer " + token
                     }
                 }).then(function() {
-                    this_.message = '1';
+                    this_.message = '1'; // თუ 1 შეინახება ცვლადში გამოჩნდება დადებითი შეტყობინება
 
+                    // 3 წამის შემდეგ კი ცვლადი გასუფთავდება, რათა შეტყობინება გაითიშოს
                     setTimeout(() => {
                         this_.message = "";
                     }, 3000);
                 }).catch(function(err) {
                     console.log(err);
-                    this_.message = '0';
-
+                    this_.message = '0'; // თუ  შეინახება ცვლადში გამოჩნდება უარყოფითი შეტყობინება
+                    
+                    // 3 წამის შემდეგ კი ცვლადი გასუფთავდება, რათა შეტყობინება გაითიშოს
                     setTimeout(() => {
                         this_.message = "";
                     }, 3000);
@@ -195,29 +221,35 @@
         },
 
         mounted() {
-            const data = window.localStorage.getItem("user");
+            const data = window.localStorage.getItem("user"); // ავტორიზირებული მომხმარებლის მონაცემების წამოღება localstorage-დან
             const thi_s = this;
 
-            const token = JSON.parse(window.localStorage.getItem("user")).token;
+            const token = JSON.parse(window.localStorage.getItem("user")).token; // ავტორიზირებული მომხმარებლის ტოკენი
             
+            // თუ ნამდვილად აქვს გავლილი ავტორიზაცია მომხმარებელს და მონაცემების შენახულია
             if(JSON.parse(data)) {
-                thi_s.$router.push({ path: "/edit/" + thi_s.$route.params.id});
+                thi_s.$router.push({ path: "/edit/" + thi_s.$route.params.id}); // დარჩება ამავე გვერდზე
             }else {
-                thi_s.$router.push({ path : "/signin"});
+                thi_s.$router.push({ path : "/signin"}); // თუ არადა გადამისამართდება ავტორიზაციის გვერდზე
             }
 
+            // საწარმოს მონაცემების წამოღება API-დან რათა მათი ველებში ჩაწერა მოხდეს დასარედაქტირებლად
             axios.get("/enterprise/get/" + thi_s.$route.params.id, {
                 headers : {
                     "Authorization" : "Bearer " + token
                 }
             }).then(function(res) {
-                thi_s.enterprise_name = res.data.enterprise_name;
-                thi_s.enterprise_field = res.data.enterprise_field;
-                thi_s.location_name = res.data.location_name;
-                thi_s.longitude = res.data.longitude;
-                thi_s.latitude = res.data.latitude;
-                thi_s.photos = res.data.photos;
+                thi_s.enterprise_name = res.data.enterprise_name; // ფორმის ობიექტში ხდება საწარმოს დასახელების სენახვა
+                thi_s.enterprise_field = res.data.enterprise_field; // ფორმის ობიექტში ხდება საწარმოს საქმიანობის სფეროს შენახვა
+                thi_s.location_name = res.data.location_name; // ფორმის ობიექტში ხდება საწარმოს ადგილმდებარეობის შენახვა
+                thi_s.longitude = res.data.longitude; // ფორმის ობიექტში ხდება საწარმოს კოორდინატი - გრძედის შენახვა 
+                thi_s.latitude = res.data.latitude; // ფორმის ობიექტში ხდება საწარმოს კოორდინატი - განედის შენახვა  
+                thi_s.photos = res.data.photos; // ფორმის ობიექტში ხდება საწარმოს ფოტოების შენახვა
             }).catch(function(err) {
+                /**
+                 * თუ საწარმოს დარედაქტირება ვერ მოხერხდა და დაფიქსირდა შეცდომა, მაშინ
+                 * კონსოლში დაიბეჭდება შესაბამისი შეტყობინება
+                 */
                 console.log(err);
             });
         }
