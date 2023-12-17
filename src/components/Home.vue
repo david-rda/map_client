@@ -44,8 +44,10 @@
                         <td>{{ item.longitude }}</td>
                         <td>{{ item.latitude }}</td>
                         <td class="text-center">
-                            <router-link :to="'/edit/' + item.id" class="btn btn-primary">რედაქტირება</router-link>
-                            <button type="button" class="btn btn-danger ms-1" :data-id="item.id" @click="deleteEnterprise($event)">წაშლა</button>
+                            <div class="btn-group">
+                                <router-link :to="'/edit/' + item.id" class="btn btn-primary">რედაქტირება</router-link>
+                                <button type="button" class="btn btn-danger" :data-id="item.id" @click="deleteEnterprise($event)">წაშლა</button>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
