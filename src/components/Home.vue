@@ -11,7 +11,10 @@
                 <div class="collapse navbar-collapse" id="nav">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <router-link to="/add" class="nav-link">საწარმოს დამატება</router-link>
+                            <router-link to="/add" class="ms-1 btn btn-success rounded-pill">საწარმოს დამატება</router-link>
+                        </li>
+                        <li class="nav-item">
+                            <router-link to="/add/project" class="ms-1 btn btn-success rounded-pill">პროექტის დამატება</router-link>
                         </li>
                     </ul>
 
