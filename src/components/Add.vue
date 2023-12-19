@@ -54,6 +54,12 @@
                             </div>
 
                             <div class="form-group mb-3">
+                                <select v-model="selected_projects" class="form-select" multiple>
+                                    <option v-for="data in project_data" :key="data.id" :value="data.id">{{ data.project_name }}</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group mb-3">
                                 <input type="file" class="form-control" id="files" @change="handleFileUpload" multiple />
                             </div>
 
@@ -92,6 +98,10 @@
                 message : "",
 
                 selectedFiles: [],
+
+                project_data : [],
+
+                selected_projects : []
             }
         },
 
@@ -123,9 +133,12 @@
                 formData.append("location_name", this.location_name);
                 formData.append("longitude", this.longitude);
                 formData.append("latitude", this.latitude);
+                formData.append("projects", this.selected_projects);
 
-                for (let i = 0; i < this.selectedFiles.length; i++) {
-                    formData.append('files[' + i + ']', this.selectedFiles[i]);
+                if(this.selectedFiles.length) {
+                    for (let i = 0; i < this.selectedFiles.length; i++) {
+                        formData.append('files[' + i + ']', this.selectedFiles[i]);
+                    }
                 }
 
                 axios.post("/enterprise/add", formData, {
@@ -165,6 +178,18 @@
             }else {
                 thi_s.$router.push({ path : "/signin"});
             }
+
+            axios.get("/project/list", {
+                headers : {
+                    "Authorization" : "Bearer " + JSON.parse(data).token
+                }
+            }).then(function(res) {
+                thi_s.project_data = res.data;
+
+                console.log(res.data)
+            }).catch(function(Err) {
+                console.log(Err);
+            });
         }
     }
 </script>

@@ -24,9 +24,18 @@
                 </div>
             </div>
         </nav>
+        
+        <div class="container mt-5">
+            <div class="d-flex justify-content-center">
+                <div class="w-25 btn-group">
+                    <button type="button" :class="this.switch === 1 ? 'btn btn-success' : 'btn btn-outline-success'" v-on:click="chooseEnterprise">საწარმოები</button>
+                    <button type="button" :class="this.switch === 2 ? 'btn btn-success' : 'btn btn-outline-success'" v-on:click="chooseProject">პროექტები</button>
+                </div>
+            </div>
+        </div>
 
         <div id="app" class="container mt-5 table-responsive">
-            <table class="table">
+            <table class="table" v-if="this.switch === 1">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -55,6 +64,28 @@
                     </tr>
                 </tbody>
             </table>
+
+            <table class="table" v-if="this.switch === 2">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>პროექტის დასახელება</th>
+                        <th class="text-center">ქმედება</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(item, index) in project_data" :key="index">
+                        <th>{{ item.id }}</th>
+                        <td>{{ item.project_name }}</td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <router-link :to="'/edit/project/' + item.id" class="btn btn-primary">რედაქტირება</router-link>
+                                <button type="button" class="btn btn-danger" :data-id="item.id" @click="deleteProject($event)">წაშლა</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </template>
@@ -67,7 +98,11 @@
 
         data() {
             return {
-                data : []
+                data : [],
+
+                project_data : [],
+
+                switch : 1
             }
         },
 
@@ -83,8 +118,16 @@
                 });
             },
 
+            chooseEnterprise() {
+                this.switch = 1;
+            },
+
+            chooseProject() {
+                this.switch = 2;
+            },
+
             deleteEnterprise(event) {
-                const token = JSON.parse(window.localStorage.getItem("user")).token
+                const token = JSON.parse(window.localStorage.getItem("user")).token;
 
                 const id = event.target.getAttribute("data-id");
 
@@ -95,9 +138,47 @@
                         "Authorization" : "Bearer " + token
                     }
                 }).then(function(response) {
-                    thi_s.data = response.data.data;
+                    console.log(response);
                 }).catch(err => {
                     console.log(err);
+                });
+
+                axios.get("/enterprise/list").then(function(res) {
+                    thi_s.data = res.data;
+
+                    console.log(res.data)
+                }).catch(function(Err) {
+                    console.log(Err);
+                });
+            },
+
+            deleteProject(event) {
+                const token = JSON.parse(window.localStorage.getItem("user")).token;
+
+                const id = event.target.getAttribute("data-id");
+
+                const thi_s = this;
+
+                axios.delete("/project/delete/" + id, {
+                    headers : {
+                        "Authorization" : "Bearer " + token
+                    }
+                }).then(function(response) {
+                    console.log(response);
+                }).catch(err => {
+                    console.log(err);
+                });
+
+                axios.get("/project/list", {
+                    headers : {
+                        "Authorization" : "Bearer " + token
+                    }
+                }).then(function(res) {
+                    thi_s.project_data = res.data;
+
+                    console.log(res.data)
+                }).catch(function(Err) {
+                    console.log(Err);
                 });
             },
         },
@@ -114,12 +195,20 @@
                 thi_s.$router.push({ path : "/signin"});
             }
 
-            axios.get("/enterprise/list", {
+            axios.get("/enterprise/list").then(function(res) {
+                thi_s.data = res.data;
+
+                console.log(res.data)
+            }).catch(function(Err) {
+                console.log(Err);
+            });
+
+            axios.get("/project/list", {
                 headers : {
                     "Authorization" : "Bearer " + token
                 }
             }).then(function(res) {
-                thi_s.data = res.data;
+                thi_s.project_data = res.data;
 
                 console.log(res.data)
             }).catch(function(Err) {

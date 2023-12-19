@@ -3,7 +3,7 @@
         <!-- <div class="container-fluid"> -->
             <nav class="navbar navbar-expand-lg bg-body-tertiary">
                 <div class="container">
-                    <router-link to="/home" class="navbar-brand"><img src="../assets/images/rda-logo-t.88318a3d.png" width="120px" /></router-link>
+                    <router-link to="/home" class="navbar-brand"><img src="../../assets/images/rda-logo-t.88318a3d.png" width="120px" /></router-link>
 
                     <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
                         <span class="navbar-toggler-icon"></span>
@@ -29,7 +29,7 @@
             <div class="container">
                 <div class="row justify-content-center mt-5">
                     <div class="col-md-6 col-12">
-                        <form method="POST" @submit.prevent="addProject()">
+                        <form method="POST" @submit.prevent="editProject()">
                             <div class="row">
                                 <div class="col-md-12 col-12">
                                     <div class="form-group mb-3">
@@ -42,11 +42,11 @@
                             </div>
 
                             <div class="alert alert-success mt-3" v-if="message == '1'">
-                                <strong>პროექტი დაემატა</strong>
+                                <strong>პროექტი დარედაქტირდა</strong>
                             </div>
 
                             <div class="alert alert-danger mt-3" v-if="message == '0'">
-                                <strong>პროექტი ვერ დაემატა</strong>
+                                <strong>პროექტი ვერ დარედაქტირდა</strong>
                             </div>
                         </form>
                     </div>
@@ -60,11 +60,12 @@
     import axios from "axios";
 
     export default {
-        name : "ProjectAdd",
+        name : "ProjectEdit",
 
         data() {
             return {
-
+                project_name : "",
+                message : ""
             }
         },
 
@@ -78,6 +79,32 @@
                 }).catch(function(err) {
                     console.log(err);
                 });
+            },
+
+            editProject() {
+                const token = JSON.parse(window.localStorage.getItem("user")).token;
+                const thi_s = this;
+
+                axios.post("/project/edit/" + this.$route.params.id, {
+                    project_name : thi_s.project_name
+                }, {
+                    headers : {
+                        "Authorization" : "Bearer " + token
+                    }
+                }).then(function() {
+                    thi_s.message = '1';
+                    thi_s.project_name = "";
+
+                    setTimeout(() => {
+                        thi_s.message = "";
+                    }, 3000);
+                }).catch(function() {
+                    thi_s.message = '0';
+
+                    setTimeout(() => {
+                        thi_s.message = "";
+                    }, 3000);
+                });
             }
         },
 
@@ -86,10 +113,25 @@
             const thi_s = this;
             
             if(JSON.parse(data)) {
-                thi_s.$router.push({ path: "/add/project"});
+                thi_s.$router.push({ path: "/edit/project/" + this.$route.params.id});
             }else {
                 thi_s.$router.push({ path : "/signin"});
             }
+
+            // პროექტის მონაცემების წამოღება API-დან რათა მათი ველებში ჩაწერა მოხდეს დასარედაქტირებლად
+            axios.get("/project/get/" + thi_s.$route.params.id, {
+                headers : {
+                    "Authorization" : "Bearer " + JSON.parse(data).token
+                }
+            }).then(function(res) {
+                thi_s.project_name = res.data.project_name; // ფორმის ობიექტში ხდება პროექტის დასახელების სენახვა
+            }).catch(function(err) {
+                /**
+                 * თუ პროექტის დარედაქტირება ვერ მოხერხდა და დაფიქსირდა შეცდომა, მაშინ
+                 * კონსოლში დაიბეჭდება შესაბამისი შეტყობინება
+                 */
+                console.log(err);
+            });
         }
     }
 </script>

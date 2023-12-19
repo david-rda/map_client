@@ -52,6 +52,11 @@
                                 <input type="text" placeholder="დარგი" class="form-control" v-model="this.enterprise_field">
                             </div>
                             <div class="form-group mb-3">
+                                <select v-model="selected_projects" class="form-select" multiple>
+                                    <option v-for="data in project_data" :key="data.id" :value="data.id">{{ data.project_name }}</option>
+                                </select>
+                            </div>
+                            <div class="form-group mb-3">
                                 <input type="file" class="form-control" id="files" @change="handleFileUpload" multiple />
                             </div>
 
@@ -111,6 +116,8 @@
                 selectedFiles: [], // მოცემულ ცვლადში შეინახება საწარმოზე მიმაგრებული სურათების ობიექტები
 
                 photos : [],
+                project_data : [],
+                selected_projects : [],
 
                 message : "", // მოცემულ ცვლადში შეინახება მნიშვნელობა, როლის მიხედვითაც მოხდება შეტყობინების გამოტანა
                 // დარედაქტირდა თუ ვერა საწარმოს მონაცემები
@@ -193,6 +200,7 @@
                 formData.append("location_name", this.location_name); // ფორმის ობიექტში ხდება საწარმოს ადგილმდებარეობის
                 formData.append("longitude", this.longitude); // ფორმის ობიექტში ხდება საწარმოს კოორდინატი - გრძედის შენახვა
                 formData.append("latitude", this.latitude); // ფორმის ობიექტში ხდება საწარმოს კოორდინატი - განედის შენახვა
+                formData.append("projects", this.selected_projects); // ობიექტში შეინახება არჩეული პროექტები
                 
                 // ფორბის ობიექტში ხდება ცვლადში შენახული ფაილების შენახვა
                 for (let i = 0; i < this.selectedFiles.length; i++) {
@@ -248,12 +256,30 @@
                 thi_s.longitude = res.data.longitude; // ფორმის ობიექტში ხდება საწარმოს კოორდინატი - გრძედის შენახვა 
                 thi_s.latitude = res.data.latitude; // ფორმის ობიექტში ხდება საწარმოს კოორდინატი - განედის შენახვა  
                 thi_s.photos = res.data.photos; // ფორმის ობიექტში ხდება საწარმოს ფოტოების შენახვა
+
+                if(res.data.projects.length) {
+                    res.data.projects.forEach((item) => {
+                        thi_s.selected_projects.push(item.id)
+                    });
+                }
             }).catch(function(err) {
                 /**
                  * თუ საწარმოს დარედაქტირება ვერ მოხერხდა და დაფიქსირდა შეცდომა, მაშინ
                  * კონსოლში დაიბეჭდება შესაბამისი შეტყობინება
                  */
                 console.log(err);
+            });
+
+            axios.get("/project/list", {
+                headers : {
+                    "Authorization" : "Bearer " + JSON.parse(data).token
+                }
+            }).then(function(res) {
+                thi_s.project_data = res.data;
+
+                console.log(res.data)
+            }).catch(function(Err) {
+                console.log(Err);
             });
         }
     }

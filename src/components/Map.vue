@@ -126,6 +126,10 @@
                     return `<button type="button" data-bs-target="#carouselExample" data-bs-slide-to="${index}" class="${isActive}" aria-current="${isActive ? 'true' : 'false'}" aria-label="Slide ${index + 1}"></button>`;
                 }).join('');
 
+                const projects = this.search_data[0].projects.map((item) => {
+                        return `<span>${'-- ' + item.project_name}</span><br>`;
+                    }).join('');
+
                 const contentString = `
                     <div style='padding:6px;max-width:300px' id='bl'>
                         <div id="carouselExample" class="carousel slide mb-1">
@@ -146,6 +150,7 @@
                         <p class='text-success'>${this.search_data[0].enterprise_name}</p>
                         <p><span style='font-weight:bold'>დარგი:&nbsp;</span> ${this.search_data[0].enterprise_field}</p>
                         <p>${this.search_data[0].location_name}</p>
+                        <p><span style='font-weight:bold'>პროგრამები/პროექტები:</span><br>${projects}</p>
                     </div>
                 `;
 
@@ -181,6 +186,10 @@
                                 </div>`;
                     }).join('');
 
+                    const projects = location.projects.map((item) => {
+                        return `<span>${'-- ' + item.project_name}</span><br>`;
+                    }).join('');
+
                     const indicators = location.photos.map((photo, index) => {
                         const isActive = index === 0 ? 'active' : ''; // Set the first indicator as active
                         return `<button type="button" data-bs-target="#carouselExample" data-bs-slide-to="${index}" class="${isActive}" aria-current="${isActive ? 'true' : 'false'}" aria-label="Slide ${index + 1}"></button>`;
@@ -206,6 +215,7 @@
                             <p class='text-success'>${location.enterprise_name}</p>
                             <p><span style='font-weight:bold'>დარგი:&nbsp;</span> ${location.enterprise_field}</p>
                             <p>${location.location_name}</p>
+                            <p><span style='font-weight:bold'>პროგრამები/პროექტები:</span><br>${projects}</p>
                         </div>
                     `;
 
