@@ -176,6 +176,7 @@
                     title: this.search_data.enterprise_name,
                     icon : {
                         url : (this.search_data[0].projects.length > 1) ? 'https://maps.google.com/mapfiles/ms/icons/green-dot.png' : 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                        scaledSize: new window.google.maps.Size(50, 50)
                     },
                 });
 
@@ -243,6 +244,7 @@
                         title: location.enterprise_name,
                         icon : {
                             url : (location.projects.length > 1) ? 'https://maps.google.com/mapfiles/ms/icons/green-dot.png' : 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                            scaledSize: new window.google.maps.Size(50, 50)
                         },
                     });
 
