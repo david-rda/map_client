@@ -5,7 +5,8 @@ import VueGoogleMaps from '@fawmi/vue-google-maps'
 import VueSweetalert2 from "vue-sweetalert2";
 import 'sweetalert2/dist/sweetalert2.min.css';
 
-axios.defaults.baseURL = "http://localhost:8000/api";
+axios.defaults.baseURL = "https://maps.rda.gov.ge/api";
+// axios.defaults.baseURL = "http://localhost:8000/api";
 
 import router from './routes'
 

@@ -3,7 +3,7 @@
         <!-- <div class="container-fluid"> -->
             <nav class="navbar navbar-expand-lg bg-body-tertiary">
                 <div class="container">
-                    <router-link to="/home" class="navbar-brand"><img src="../assets/images/rda-logo-t.88318a3d.png" width="120px" /></router-link>
+                    <router-link to="/home" class="navbar-brand"><img src="../assets/img/rda-logo-t.88318a3d.png" width="120px" /></router-link>
 
                     <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
                         <span class="navbar-toggler-icon"></span>
@@ -53,10 +53,12 @@
                                 <input type="text" placeholder="დარგი" class="form-control" v-model="enterprise_field">
                             </div>
 
-                            <div class="form-group mb-3">
-                                <select v-model="selected_projects" class="form-select" multiple>
-                                    <option v-for="data in project_data" :key="data.id" :value="data.id">{{ data.project_name }}</option>
-                                </select>
+                            <div class="form-group mb-3 border p-1 rounded">
+                                <div v-for="(option, index) in options" :key="index">
+                                    <label :for="'option_' + index">
+                                        <input type="checkbox" :id="'option_' + index" :value="option.id" v-model="selectedOptions" />&nbsp;&nbsp;{{ option.project_name }}
+                                    </label>
+                                </div>
                             </div>
 
                             <div class="form-group mb-3">
@@ -101,7 +103,9 @@
 
                 project_data : [],
 
-                selected_projects : []
+                options : [],
+
+                selectedOptions: []
             }
         },
 
@@ -133,7 +137,7 @@
                 formData.append("location_name", this.location_name);
                 formData.append("longitude", this.longitude);
                 formData.append("latitude", this.latitude);
-                formData.append("projects", this.selected_projects);
+                formData.append("projects", this.selectedOptions);
 
                 if(this.selectedFiles.length) {
                     for (let i = 0; i < this.selectedFiles.length; i++) {
@@ -184,7 +188,7 @@
                     "Authorization" : "Bearer " + JSON.parse(data).token
                 }
             }).then(function(res) {
-                thi_s.project_data = res.data;
+                thi_s.options = res.data;
 
                 console.log(res.data)
             }).catch(function(Err) {

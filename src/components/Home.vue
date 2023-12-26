@@ -2,7 +2,7 @@
     <div>
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container">
-                <router-link to="/home" class="navbar-brand"><img src="../assets/images/rda-logo-t.88318a3d.png" width="120px" /></router-link>
+                <router-link to="/home" class="navbar-brand"><img src="../assets/img/rda-logo-t.88318a3d.png" width="120px" /></router-link>
 
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
                     <span class="navbar-toggler-icon"></span>
@@ -32,9 +32,12 @@
                     <button type="button" :class="this.switch === 2 ? 'btn btn-success' : 'btn btn-outline-success'" v-on:click="chooseProject">პროექტები</button>
                 </div>
             </div>
+            <div class="d-flex justify-content-center">
+                <span class="spinner spinner-border mt-5" v-show="loading"></span>
+            </div>
         </div>
 
-        <div id="app" class="container mt-5 table-responsive">
+        <div id="app" class="container mt-5 table-responsive" v-show="!loading">
             <table class="table" v-if="this.switch === 1">
                 <thead>
                     <tr>
@@ -102,7 +105,9 @@
 
                 project_data : [],
 
-                switch : 1
+                switch : 1,
+
+                loading : 1
             }
         },
 
@@ -133,22 +138,14 @@
 
                 const thi_s = this;
 
-                axios.delete("/enterprise/delete/" + id, {
+                axios.get("/enterprise/delete/" + id, {
                     headers : {
                         "Authorization" : "Bearer " + token
                     }
                 }).then(function(response) {
-                    console.log(response);
+                    thi_s.data = response.data.data;
                 }).catch(err => {
                     console.log(err);
-                });
-
-                axios.get("/enterprise/list").then(function(res) {
-                    thi_s.data = res.data;
-
-                    console.log(res.data)
-                }).catch(function(Err) {
-                    console.log(Err);
                 });
             },
 
@@ -159,26 +156,14 @@
 
                 const thi_s = this;
 
-                axios.delete("/project/delete/" + id, {
+                axios.get("/project/delete/" + id, {
                     headers : {
                         "Authorization" : "Bearer " + token
                     }
                 }).then(function(response) {
-                    console.log(response);
+                    thi_s.project_data = response.data.projects;
                 }).catch(err => {
                     console.log(err);
-                });
-
-                axios.get("/project/list", {
-                    headers : {
-                        "Authorization" : "Bearer " + token
-                    }
-                }).then(function(res) {
-                    thi_s.project_data = res.data;
-
-                    console.log(res.data)
-                }).catch(function(Err) {
-                    console.log(Err);
                 });
             },
         },
@@ -186,8 +171,6 @@
         mounted() {
             const data = window.localStorage.getItem("user");
             const thi_s = this;
-
-            const token = JSON.parse(window.localStorage.getItem("user")).token;
             
             if(JSON.parse(data)) {
                 thi_s.$router.push({ path: "/home"});
@@ -197,17 +180,14 @@
 
             axios.get("/enterprise/list").then(function(res) {
                 thi_s.data = res.data;
+                thi_s.loading = 0;
 
                 console.log(res.data)
             }).catch(function(Err) {
                 console.log(Err);
             });
 
-            axios.get("/project/list", {
-                headers : {
-                    "Authorization" : "Bearer " + token
-                }
-            }).then(function(res) {
+            axios.get("/project/list").then(function(res) {
                 thi_s.project_data = res.data;
 
                 console.log(res.data)

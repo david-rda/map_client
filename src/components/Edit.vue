@@ -3,7 +3,7 @@
         <!-- <div class="container-fluid"> -->
             <nav class="navbar navbar-expand-lg bg-body-tertiary">
                 <div class="container">
-                    <router-link to="/home" class="navbar-brand"><img src="../assets/images/rda-logo-t.88318a3d.png" width="120px" /></router-link>
+                    <router-link to="/home" class="navbar-brand"><img src="../assets/img/rda-logo-t.88318a3d.png" width="120px" /></router-link>
 
                     <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
                         <span class="navbar-toggler-icon"></span>
@@ -51,10 +51,12 @@
                             <div class="form-group mb-3">
                                 <input type="text" placeholder="დარგი" class="form-control" v-model="this.enterprise_field">
                             </div>
-                            <div class="form-group mb-3">
-                                <select v-model="selected_projects" class="form-select" multiple>
-                                    <option v-for="data in project_data" :key="data.id" :value="data.id">{{ data.project_name }}</option>
-                                </select>
+                            <div class="form-group mb-3 border p-1 rounded">
+                                <div v-for="(option, index) in options" :key="index">
+                                    <label :for="'option_' + index">
+                                        <input type="checkbox" :id="'option_' + index" :value="option.id" v-model="selectedOptions" />&nbsp;&nbsp;{{ option.project_name }}
+                                    </label>
+                                </div>
                             </div>
                             <div class="form-group mb-3">
                                 <input type="file" class="form-control" id="files" @change="handleFileUpload" multiple />
@@ -63,7 +65,7 @@
                             <ul class="list-group mb-2 overflow-auto">
                                 <li class="list-group-item d-flex justify-content-between overflow-auto" v-for="data in this.photos" :key="data.id">
                                     <div>
-                                        <img :src="'http://localhost:8000/images/' + data.name" data-bs-toggle="modal" data-bs-target="#mymodal" :data-path="data.name" v-on:click="expandImage($event)" class="img-thumbnail" style="width:50px;height:50px;cursor:pointer">
+                                        <img :src="(data.extension == 'JPG' || data.extension == 'jpg') ? 'data:image/jpeg;base64,' + data.file : 'data:image/png;base64,' + data.file" data-bs-toggle="modal" data-bs-target="#mymodal" :data-path="data.name" v-on:click="expandImage($event)" class="img-thumbnail" style="width:50px;height:50px;cursor:pointer">
                                         <span class="ms-1">{{ data.name }}</span>
                                     </div>
 
@@ -91,7 +93,7 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-body">
-                            <img :src="'http://localhost:8000/images/' + this.zoomed_path" class="w-100" />
+                            <img :src="'https://maps.rda.gov.ge/images/' + this.zoomed_path" class="w-100" />
                         </div>
                     </div>
                 </div>
@@ -117,7 +119,8 @@
 
                 photos : [],
                 project_data : [],
-                selected_projects : [],
+                selectedOptions : [],
+                options : [],
 
                 message : "", // მოცემულ ცვლადში შეინახება მნიშვნელობა, როლის მიხედვითაც მოხდება შეტყობინების გამოტანა
                 // დარედაქტირდა თუ ვერა საწარმოს მონაცემები
@@ -160,16 +163,17 @@
                 const thi_s = this;
 
                 // API-ზე მოხდება მოთხოვნის გაგზავნა, რომელიც მოახდენს ფოტოს წაშლას ბაზიდან
-                axios.delete("/enterprise/delete/photo/" + id + "/" + this.$route.params.id, {
+                axios.get("/enterprise/delete/photo/" + id + "/" + this.$route.params.id, {
                     headers : {
-                        "Authorization" : "Bearer " + token
+                        "Authorization" : "Bearer " + token,
+                        "Content-Type": "multipart/form-data"
                     }
                 }).then(function(response) {
                     /**
                      * თუ ფოტო წაიშალა დააბრუნებს განახლებულ რაოდენობას ფოტოებისას
                      * კონკრეტული საწარმოსთვის და შეინახება მონაცემები photos ცვლადში
                      */
-                    thi_s.photos = response.data.data.photos;
+                    thi_s.photos = response.data.photos;
                 }).catch(err => {
                     /**
                      * თუ ფოტოს წაშლა ვერ მოხერხდა და დაფიქსირდა შეცდომა, მაშინ
@@ -200,7 +204,7 @@
                 formData.append("location_name", this.location_name); // ფორმის ობიექტში ხდება საწარმოს ადგილმდებარეობის
                 formData.append("longitude", this.longitude); // ფორმის ობიექტში ხდება საწარმოს კოორდინატი - გრძედის შენახვა
                 formData.append("latitude", this.latitude); // ფორმის ობიექტში ხდება საწარმოს კოორდინატი - განედის შენახვა
-                formData.append("projects", this.selected_projects); // ობიექტში შეინახება არჩეული პროექტები
+                formData.append("projects", this.selectedOptions); // ობიექტში შეინახება არჩეული პროექტები
                 
                 // ფორბის ობიექტში ხდება ცვლადში შენახული ფაილების შენახვა
                 for (let i = 0; i < this.selectedFiles.length; i++) {
@@ -259,7 +263,7 @@
 
                 if(res.data.projects.length) {
                     res.data.projects.forEach((item) => {
-                        thi_s.selected_projects.push(item.id)
+                        thi_s.selectedOptions.push(item.id)
                     });
                 }
             }).catch(function(err) {
@@ -270,12 +274,8 @@
                 console.log(err);
             });
 
-            axios.get("/project/list", {
-                headers : {
-                    "Authorization" : "Bearer " + JSON.parse(data).token
-                }
-            }).then(function(res) {
-                thi_s.project_data = res.data;
+            axios.get("/project/list").then(function(res) {
+                thi_s.options = res.data;
 
                 console.log(res.data)
             }).catch(function(Err) {

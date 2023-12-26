@@ -3,7 +3,7 @@
         <!-- <div class="container-fluid"> -->
             <nav class="navbar navbar-expand-lg bg-body-tertiary">
                 <div class="container">
-                    <router-link to="/home" class="navbar-brand"><img src="../../assets/images/rda-logo-t.88318a3d.png" width="120px" /></router-link>
+                    <router-link to="/home" class="navbar-brand"><img src="../../assets/img/rda-logo-t.88318a3d.png" width="120px" /></router-link>
 
                     <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
                         <span class="navbar-toggler-icon"></span>
@@ -35,8 +35,19 @@
                                     <div class="form-group mb-3">
                                         <input type="text" placeholder="პროექტის დასახელება" class="form-control" v-model="project_name">
                                     </div>
+                                    <div class="form-group mb-3">
+                                        <input type="file" class="form-control" id="files" @change="handleFileUpload" />
+                                    </div>
+                                    <ul class="list-group mb-2 overflow-auto" v-if="img">
+                                        <li class="list-group-item d-flex justify-content-between overflow-auto">
+                                            <div>
+                                                <img :src="'data:image/png;base64,' + img" width="80px" height="80px" class="img-thumbnail">
+                                            </div>
+                                            <button type="button" class="btn btn-danger" :data-id="this.$route.params.id" v-on:click="deleteIcon($event)">წაშლა</button>
+                                        </li>
+                                    </ul>
                                     <div class="form-group d-grid">
-                                        <input type="submit" value="შესვლა">
+                                        <input type="submit" value="დარედაქტირება">
                                     </div>
                                 </div>
                             </div>
@@ -65,7 +76,9 @@
         data() {
             return {
                 project_name : "",
-                message : ""
+                message : "",
+                selectedFile : "",
+                img : ""
             }
         },
 
@@ -81,13 +94,35 @@
                 });
             },
 
+            handleFileUpload(event) {
+                this.selectedFile = event.target.files[0];
+            },
+
+            deleteIcon(event) {
+                const id = event.target.getAttribute("data-id");
+                const thi_s = this;
+
+                axios.get("/project/delete/icon/" + id, {
+                    headers : {
+                        "Authorization" : "Bearer " + JSON.parse(window.localStorage.getItem("user")).token
+                    }
+                }).then(function(res) {
+                    thi_s.img = res.data.image;
+                }).catch(function(err) {
+                    console.log(err);
+                });
+            },
+
             editProject() {
                 const token = JSON.parse(window.localStorage.getItem("user")).token;
                 const thi_s = this;
 
-                axios.post("/project/edit/" + this.$route.params.id, {
-                    project_name : thi_s.project_name
-                }, {
+                const formData = new FormData();
+
+                formData.append("project_name", thi_s.project_name);
+                formData.append("file", thi_s.selectedFile);
+
+                axios.post("/project/edit/" + this.$route.params.id, formData, {
                     headers : {
                         "Authorization" : "Bearer " + token
                     }
@@ -124,7 +159,8 @@
                     "Authorization" : "Bearer " + JSON.parse(data).token
                 }
             }).then(function(res) {
-                thi_s.project_name = res.data.project_name; // ფორმის ობიექტში ხდება პროექტის დასახელების სენახვა
+                thi_s.project_name = res.data.project_name; // ფორმის ობიექტში ხდება პროექტის დასახელების შენახვა
+                thi_s.img = res.data.image; // ფორმის ობიექტში ხდება პროექტის აიკონის შენახვა
             }).catch(function(err) {
                 /**
                  * თუ პროექტის დარედაქტირება ვერ მოხერხდა და დაფიქსირდა შეცდომა, მაშინ

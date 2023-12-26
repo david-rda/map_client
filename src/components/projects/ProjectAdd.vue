@@ -3,7 +3,7 @@
         <!-- <div class="container-fluid"> -->
             <nav class="navbar navbar-expand-lg bg-body-tertiary">
                 <div class="container">
-                    <router-link to="/home" class="navbar-brand"><img src="../../assets/images/rda-logo-t.88318a3d.png" width="120px" /></router-link>
+                    <router-link to="/home" class="navbar-brand"><img src="../../assets/img/rda-logo-t.88318a3d.png" width="120px" /></router-link>
 
                     <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
                         <span class="navbar-toggler-icon"></span>
@@ -35,6 +35,9 @@
                                     <div class="form-group mb-3">
                                         <input type="text" placeholder="პროექტის დასახელება" class="form-control" v-model="project_name">
                                     </div>
+                                    <div class="form-group mb-3">
+                                        <input type="file" class="form-control" id="files" @change="handleFileUpload" />
+                                    </div>
                                     <div class="form-group d-grid">
                                         <input type="submit" value="დამატება">
                                     </div>
@@ -65,7 +68,8 @@
         data() {
             return {
                 project_name : "",
-                message : ""
+                message : "",
+                selectedFile: "",
             }
         },
 
@@ -81,13 +85,20 @@
                 });
             },
 
+            handleFileUpload(event) {
+                this.selectedFile = event.target.files[0];
+            },
+
             addProject() {
                 const token = JSON.parse(window.localStorage.getItem("user")).token;
                 const thi_s = this;
 
-                axios.post("/project/add", {
-                    project_name : thi_s.project_name
-                }, {
+                const formData = new FormData();
+
+                formData.append("project_name", thi_s.project_name);
+                formData.append("file", thi_s.selectedFile);
+
+                axios.post("/project/add", formData, {
                     headers : {
                         "Authorization" : "Bearer " + token
                     }

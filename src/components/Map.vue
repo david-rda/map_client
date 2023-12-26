@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div ref="map" style="height: 96vh;"></div>
+    <div ref="map" style="height:100vh"></div>
 
-    <button type="button" class="btn btn-light position-absolute top-0 start-0 m-2" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">
+    <button type="button" class="btn btn-light position-absolute top-0 end-0" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" style="margin-right:60px !important;margin-top: 10px">
         <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M4 18L20 18" stroke="#000" stroke-width="2" stroke-linecap="round"/>
             <path d="M4 12L20 12" stroke="#000" stroke-width="2" stroke-linecap="round"/>
@@ -10,7 +10,7 @@
         </svg>
     </button>
 
-    <div class="offcanvas offcanvas-start" id="offcanvas">
+    <div class="offcanvas offcanvas-end" id="offcanvas">
         <div class="offcanvas-header">
             <h4 class="offcanvas-title">პროექტები</h4>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
@@ -18,8 +18,9 @@
 
         <div class="offcanvas-body">
             <ul class="list-unstyled d-grid">
-                <li class="btn btn-light text-align-start m-2" v-for="data in projects" :data-id="data.id" :key="data.id" @click="getCoordsByProjects($event)">
-                    {{ data.project_name }}
+                <li class="btn btn-light text-align-start m-2 d-flex justify-content-around" v-for="data in projects" :data-id="data.id" :key="data.id" @click="getCoordsByProjects($event)">
+                    <span>{{ data.project_name }}</span>
+                    <img :src="'data:image/png;base64,' + data.image" width="25px" height="25px" />
                 </li>
                 <div class="row justify-content-center">
                     <span class="spinner spinner-border text-muted" v-if="this.show_spinner"></span>
@@ -28,7 +29,7 @@
         </div>
     </div>
 
-    <div class="position-fixed z-2 top-0 end-0" style="margin-right:70px;margin-top:10px">
+    <div class="position-fixed z-2 top-0 end-0" style="margin-right:120px;margin-top:10px">
         <input type="search" placeholder="საწარმოს ძებნა..." class="form-control search" style="width:300px" @keyup="searchEnterprise($event)">
 
         <div class="bg-white p-2 mt-1" v-if="this.showsearch == 1" id="search_block" style="width:300px;cursor:pointer">
@@ -39,7 +40,7 @@
         </div>
     </div>
 
-    <div class="bg-success vw-100" style="height:4vh" id="bottom">
+    <div class="bg-success position-fixed bottom-0 start-0 w-100 p-2">
         <div class="container">
             <div class="d-flex float-start">
                 <a href="https://mepa.gov.ge" class="text-white nav-link d-inline-block" style="font-size: 12px">MEPA.GOV.GE</a>
@@ -62,6 +63,8 @@
 
 <script>
     import axios from 'axios';
+    import pin from "../assets/img/mainpin.png";
+    import red_marker from "../assets/img/red.png";
 
     export default {
         name : "MyMap",
@@ -82,11 +85,7 @@
 
             const thi_s = this;
 
-            axios.get("/project/list", {
-                headers : {
-                    "Authorization" : "Bearer " + JSON.parse(window.localStorage.getItem("user")).token
-                }
-            }).then(function(response) {
+            axios.get("/project/list").then(function(response) {
                 thi_s.projects = response.data;
             }).catch(function(err) {
                 console.log(err);
@@ -143,11 +142,7 @@
 
                 this.show_spinner = true;
 
-                axios.get("/enterprise/get/by/project/" + event.target.getAttribute("data-id"), {
-                    headers : {
-                        "Authorization" : "Bearer " + JSON.parse(window.localStorage.getItem("user")).token
-                    }
-                }).then(function(response) {
+                axios.get("/enterprise/get/by/project/" + event.target.getAttribute("data-id")).then(function(response) {
                     thi_s.locations = response.data;
                 }).catch(function(err) {
                     console.log(err);
@@ -155,7 +150,7 @@
 
                 window.setTimeout(() => {
                     this.initializeMap();
-                    thi_s.show_spinner = false;
+                    this.show_spinner = false;
                 }, 2000);
             },
 
@@ -175,15 +170,15 @@
                     map: map,
                     title: this.search_data.enterprise_name,
                     icon : {
-                        url : (this.search_data[0].projects.length > 1) ? 'https://maps.google.com/mapfiles/ms/icons/green-dot.png' : 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-                        scaledSize: new window.google.maps.Size(50, 50)
+                        url : (this.search_data[0].projects.length > 1) ? red_marker : pin,
+                        scaledSize: (this.search_data[0].projects.length > 1) ? new window.google.maps.Size(25, 35) : new window.google.maps.Size(40, 40)
                     },
                 });
 
                 const images = this.search_data[0].photos.map((photo, index) => {
                         const isActive = index === 0 ? 'active' : '';
                         return `<div class="carousel-item ${isActive}">
-                                    <img src="http://localhost:8000/images/${photo.name}" class="d-block " style="height:200px"/>
+                                    <img src="${'data:image/jpeg;base64,' + photo.file}" class="d-block " style="height:200px"/>
                                 </div>`;
                     }).join('');
 
@@ -231,8 +226,7 @@
                     center: {
                         lat: 42, lng: 43
                     },
-
-                    zoom: 8
+                    zoom: 8,
                 });
 
                 const infoWindow = new window.google.maps.InfoWindow();
@@ -241,17 +235,18 @@
                     const marker = new window.google.maps.Marker({
                         position: { lat: parseFloat(location.latitude), lng: parseFloat(location.longitude) },
                         map,
+                        animation : window.google.maps.Animation.DROP,
                         title: location.enterprise_name,
                         icon : {
-                            url : (location.projects.length > 1) ? 'https://maps.google.com/mapfiles/ms/icons/green-dot.png' : 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-                            scaledSize: new window.google.maps.Size(50, 50)
+                            url : (location.projects.length > 1) ? red_marker : pin,
+                            scaledSize: (location.projects.length > 1) ? new window.google.maps.Size(25, 35) : new window.google.maps.Size(40, 40)
                         },
                     });
 
                     const images = location.photos.map((photo, index) => {
                         const isActive = index === 0 ? 'active' : '';
                         return `<div class="carousel-item ${isActive}">
-                                    <img src="http://localhost:8000/images/${photo.name}" class="d-block " style="height:200px"/>
+                                    <img src="${'data:image/jpeg;base64,' + photo.file}" class="d-block " style="height:200px"/>
                                 </div>`;
                     }).join('');
 
@@ -303,11 +298,9 @@
         #texts {
             float: left !important;
         }
-    }
 
-    @media screen and (min-width: 768px) {
-        #bottom {
-            padding: 6px;
+        input[type="search"] {
+            width: 250px !important;
         }
     }
 
