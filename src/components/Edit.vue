@@ -31,27 +31,33 @@
                     <div class="col-md-6 col-12">
                         <form method="POST" @submit.prevent="editEnterprise()">
                             <div class="row">
-                                <div class="col-md-6 col-12">
+                                <div class="col-md-6 col-12 mb-3">
                                     <div class="form-group">
+                                        <label><b>გრძედი</b></label>
                                         <input type="text" placeholder="გრძედი" class="form-control" v-model="this.longitude">
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-12">
                                     <div class="form-group">
+                                        <label><b>განედი</b></label>
                                         <input type="text" placeholder="განედი" class="form-control" v-model="this.latitude">
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group mb-3">
+                                <label><b>საწარმოს დასახელება</b></label>
                                 <input type="text" placeholder="საწარმოს დასახელება" class="form-control" v-model="this.enterprise_name">
                             </div>
                             <div class="form-group mb-3">
+                                <label><b>ლოკაციის დასახელება</b></label>
                                 <input type="text" placeholder="ლოკაციის დასახელება" class="form-control" v-model="this.location_name">
                             </div>
                             <div class="form-group mb-3">
+                                <label><b>დარგი</b></label>
                                 <input type="text" placeholder="დარგი" class="form-control" v-model="this.enterprise_field">
                             </div>
                             <div class="form-group mb-3 border p-1 rounded">
+                                <p class="mb-2 text-center">პროექტები/პროგრამები</p>
                                 <div v-for="(option, index) in options" :key="index">
                                     <label :for="'option_' + index">
                                         <input type="checkbox" :id="'option_' + index" :value="option.id" v-model="selectedOptions" />&nbsp;&nbsp;{{ option.project_name }}
@@ -65,7 +71,7 @@
                             <ul class="list-group mb-2 overflow-auto">
                                 <li class="list-group-item d-flex justify-content-between overflow-auto" v-for="data in this.photos" :key="data.id">
                                     <div>
-                                        <img :src="(data.extension == 'JPG' || data.extension == 'jpg') ? 'data:image/jpeg;base64,' + data.file : 'data:image/png;base64,' + data.file" data-bs-toggle="modal" data-bs-target="#mymodal" :data-path="data.name" v-on:click="expandImage($event)" class="img-thumbnail" style="width:50px;height:50px;cursor:pointer">
+                                        <img :src="'https://maps.rda.gov.ge/images/' + data.name" class="img-thumbnail" style="width:50px;height:50px;cursor:pointer">
                                         <span class="ms-1">{{ data.name }}</span>
                                     </div>
 
@@ -85,16 +91,6 @@
                                 <strong>საწარმო ვერ დარედაქტირდა</strong>
                             </div>
                         </form>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal fade" id="mymodal">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <img :src="'https://maps.rda.gov.ge/images/' + this.zoomed_path" class="w-100" />
-                        </div>
                     </div>
                 </div>
             </div>
@@ -166,7 +162,6 @@
                 axios.get("/enterprise/delete/photo/" + id + "/" + this.$route.params.id, {
                     headers : {
                         "Authorization" : "Bearer " + token,
-                        "Content-Type": "multipart/form-data"
                     }
                 }).then(function(response) {
                     /**
@@ -214,7 +209,8 @@
                 // API-ზე მოხდება მოთხოვნის გაგზავნა, რათა მოხდეს მონაცემთა დადასტურება და შეცვლა ბაზაში
                 axios.post("/enterprise/edit/" + this.$route.params.id, formData, {
                     headers : {
-                        "Authorization" : "Bearer " + token
+                        "Authorization" : "Bearer " + token,
+                        "Content-Type": "multipart/form-data"
                     }
                 }).then(function() {
                     this_.message = '1'; // თუ 1 შეინახება ცვლადში გამოჩნდება დადებითი შეტყობინება
@@ -236,6 +232,8 @@
         },
 
         mounted() {
+            document.title = "საწარმოს რედაქტირება";
+            
             const data = window.localStorage.getItem("user"); // ავტორიზირებული მომხმარებლის მონაცემების წამოღება localstorage-დან
             const thi_s = this;
 

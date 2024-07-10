@@ -22,7 +22,7 @@
             </div>
         </div>
 
-        <p class="disabled text-center text-muted mt-3" style="user-select:none">©&nbsp;2022&nbsp; - 2023&nbsp;Created&nbsp;by&nbsp;<strong>RDA</strong>&nbsp;IT&nbsp;team</p>
+        <p class="disabled text-center text-muted mt-3" style="user-select:none">©&nbsp;2023&nbsp; - <span ref="year"></span>&nbsp;Created&nbsp;by&nbsp;<strong>RDA</strong>&nbsp;IT&nbsp;team</p>
     </div>
 </template>
 
@@ -88,6 +88,8 @@
             document.title = "სისტემაში შესვლა";
 
             const thi_s = this;
+
+            this.$refs.year.innerHTML = new Date().getFullYear();
 
             const data = window.localStorage.getItem("user");
 

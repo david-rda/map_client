@@ -31,29 +31,35 @@
                     <div class="col-md-6 col-12">
                         <form method="POST" @submit.prevent="addEnterprise()">
                             <div class="row">
-                                <div class="col-md-6 col-12">
+                                <div class="col-md-6 col-12 mb-3">
                                     <div class="form-group">
+                                        <label><b>გრძედი</b></label>
                                         <input type="text" placeholder="გრძედი" class="form-control" v-model="longitude">
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-12">
                                     <div class="form-group">
+                                        <label><b>განედი</b></label>
                                         <input type="text" placeholder="განედი" class="form-control" v-model="latitude">
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group mb-3">
+                                <label><b>საწარმოს დასახელება</b></label>
                                 <input type="text" placeholder="საწარმოს დასახელება" class="form-control" v-model="enterprise_name">
                             </div>
                             <div class="form-group mb-3">
+                                <label><b>ლოკაციის დასახელება</b></label>
                                 <input type="text" placeholder="ლოკაციის დასახელება" class="form-control" v-model="location_name">
                             </div>
 
                             <div class="form-group mb-3">
+                                <label><b>დარგი</b></label>
                                 <input type="text" placeholder="დარგი" class="form-control" v-model="enterprise_field">
                             </div>
 
-                            <div class="form-group mb-3 border p-1 rounded">
+                            <div class="form-group mb-3 border p-3 rounded">
+                                <p class="mb-2 text-center">პროექტები/პროგრამები</p>
                                 <div v-for="(option, index) in options" :key="index">
                                     <label :for="'option_' + index">
                                         <input type="checkbox" :id="'option_' + index" :value="option.id" v-model="selectedOptions" />&nbsp;&nbsp;{{ option.project_name }}
@@ -147,7 +153,8 @@
 
                 axios.post("/enterprise/add", formData, {
                     headers : {
-                        "Authorization" : "Bearer " + token
+                        "Authorization" : "Bearer " + token,
+                        "Content-Type": "multipart/form-data"
                     }
                 }).then(function() {
                     this_.enterprise_name = "";
@@ -174,6 +181,8 @@
         },
 
         mounted() {
+            document.title = "საწარმოს დამატება";
+
             const data = window.localStorage.getItem("user");
             const thi_s = this;
             

@@ -33,6 +33,7 @@
                             <div class="row">
                                 <div class="col-md-12 col-12">
                                     <div class="form-group mb-3">
+                                        <label><b>პროექტის დასახელება</b></label>
                                         <input type="text" placeholder="პროექტის დასახელება" class="form-control" v-model="project_name">
                                     </div>
                                     <div class="form-group mb-3">
@@ -144,6 +145,8 @@
         },
 
         mounted() {
+            document.title = "პროექტის რედაქტირება";
+
             const data = window.localStorage.getItem("user");
             const thi_s = this;
             

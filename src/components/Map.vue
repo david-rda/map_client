@@ -2,6 +2,10 @@
   <div>
     <div ref="map" style="height:100vh"></div>
 
+    <div class="h-100 w-100 d-flex justify-content-center align-items-center position-fixed top-0 start-0 z-3" v-if="loader">
+        <span class="spinner spinner-border text-success"></span>
+    </div>
+
     <button type="button" class="btn btn-light position-absolute top-0 end-0" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" style="margin-right:60px !important;margin-top: 10px">
         <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M4 18L20 18" stroke="#000" stroke-width="2" stroke-linecap="round"/>
@@ -18,10 +22,15 @@
 
         <div class="offcanvas-body">
             <ul class="list-unstyled d-grid">
-                <li class="btn btn-light text-align-start m-2 d-flex justify-content-around" v-for="data in projects" :data-id="data.id" :key="data.id" @click="getCoordsByProjects($event)">
-                    <span>{{ data.project_name }}</span>
-                    <img :src="'data:image/png;base64,' + data.image" width="25px" height="25px" />
+                <li class="btn btn-light mb-2 d-flex justify-content-center" v-for="data in projects" :data-id="data.id" :key="data.id" @click="getCoordsByProjects($event)">
+                    <span style="pointer-events: none;">{{ data.project_name }}</span>
+                    &nbsp;&nbsp;&nbsp;
+                    <img v-if="data.image" style="pointer-events: none;" :src="'data:image/png;base64,' + data.image" width="25px" height="25px" />
                 </li>
+                <hr>
+                <div class="d-grid mb-3">
+                    <button type="button" class="btn btn-outline-success" v-on:click="loadAll()">ყველას ჩვენება</button>
+                </div>
                 <div class="row justify-content-center">
                     <span class="spinner spinner-border text-muted" v-if="this.show_spinner"></span>
                 </div>
@@ -29,10 +38,10 @@
         </div>
     </div>
 
-    <div class="position-fixed z-2 top-0 end-0" style="margin-right:120px;margin-top:10px">
+    <div class="position-fixed z-2 top-0 end-0 main-search-block" style="margin-right:120px;margin-top:10px">
         <input type="search" placeholder="საწარმოს ძებნა..." class="form-control search" style="width:300px" @keyup="searchEnterprise($event)">
 
-        <div class="bg-white p-2 mt-1" v-if="this.showsearch == 1" id="search_block" style="width:300px;cursor:pointer">
+        <div class="bg-white p-2 mt-1 overflow-auto" v-if="this.showsearch == 1" id="search_block" style="max-height: 400px;width:300px;cursor:pointer">
             <div class="border rounded p-1 mb-1 overflow-auto" style="max-height:300px" v-for="data in this.search_data" :data-longitude="data.longitude" :data-latitude="data.latitude" :key="data.id" @click="getCoords($event)">
                 <p class="text-success m-0" style="font-size: 13px;pointer-events:none">{{ data.enterprise_name }}</p>
                 <p class="text-muted m-0" style="font-size: 13px;pointer-events:none">{{ data.location_name }}</p>
@@ -76,12 +85,16 @@
                 showsearch : 0,
                 show_spinner : false,
 
-                projects : []
+                projects : [],
+
+                loader : true
             };
         },
 
         mounted() {
             this.fetchLocations();
+
+            document.title = "საწარმოების რუკა";
 
             const thi_s = this;
 
@@ -103,6 +116,8 @@
 
                     this.initializeMap();
 
+                    this.loader = false;
+
                 } catch (error) {
                     console.error(error);
                 }
@@ -111,7 +126,7 @@
             async searchEnterprise(event) {
                 const thi_s = this;
 
-                if(event.target.value == 0) {
+                if(event.target.value == 0 && event.keyCode == 8) {
                     this.showsearch = 0;
 
                     try {
@@ -119,13 +134,11 @@
 
                         this.locations = response.data;
 
-                        console.log(this.locations);
-
                         this.initializeMap();
-
                     } catch (error) {
                         console.error(error);
                     }
+
                 }
 
                 axios.post("/enterprise/search", { value : event.target.value }).then(function(response) {
@@ -135,6 +148,10 @@
                     console.log(err);
                     thi_s.showsearch = 0;
                 })
+            },
+
+            loadAll() {
+                this.fetchLocations();
             },
 
             getCoordsByProjects(event) {
@@ -165,22 +182,24 @@
                     zoom: 15
                 });
 
-                const marker = new window.google.maps.Marker({
-                    position: { lat: latitude, lng: longitude },
-                    map: map,
-                    title: this.search_data.enterprise_name,
+                var marker = new window.google.maps.Marker({
+                    position: { lat: parseFloat(latitude), lng: parseFloat(longitude) },
+                    map,
+                    animation : window.google.maps.Animation.DROP,
+                    title: this.search_data[0].enterprise_name,
                     icon : {
-                        url : (this.search_data[0].projects.length > 1) ? red_marker : pin,
-                        scaledSize: (this.search_data[0].projects.length > 1) ? new window.google.maps.Size(25, 35) : new window.google.maps.Size(40, 40)
+                        url : (this.search_data[0].projects.length > 1) ? pin : this.search_data[0].projects.length == 1 ? "data:image/png;base64," + this.search_data[0].projects[0].image : red_marker,
+
+                        scaledSize: (this.search_data[0].projects.length > 1) ? '' : new window.google.maps.Size(34, 35)
                     },
                 });
 
                 const images = this.search_data[0].photos.map((photo, index) => {
-                        const isActive = index === 0 ? 'active' : '';
-                        return `<div class="carousel-item ${isActive}">
-                                    <img src="${'data:image/jpeg;base64,' + photo.file}" class="d-block " style="height:200px"/>
-                                </div>`;
-                    }).join('');
+                    const isActive = index === 0 ? 'active' : '';
+                    return `<div class="carousel-item ${isActive}">
+                                <img src="${'https://maps.rda.gov.ge/images/' + photo.name}" class="d-block " style="height:200px"/>
+                            </div>`;
+                }).join('');
 
                 const indicators = this.search_data[0].photos.map((photo, index) => {
                     const isActive = index === 0 ? 'active' : '';
@@ -238,15 +257,15 @@
                         animation : window.google.maps.Animation.DROP,
                         title: location.enterprise_name,
                         icon : {
-                            url : (location.projects.length > 1) ? red_marker : pin,
-                            scaledSize: (location.projects.length > 1) ? new window.google.maps.Size(25, 35) : new window.google.maps.Size(40, 40)
+                            url : (location.projects.length > 1) ? pin : (location.projects.length == 1) ? "data:image/png;base64," + location.projects[0].image : red_marker,
+                            scaledSize: (location.projects.length > 1) ? '' : new window.google.maps.Size(34, 35)
                         },
                     });
 
                     const images = location.photos.map((photo, index) => {
                         const isActive = index === 0 ? 'active' : '';
                         return `<div class="carousel-item ${isActive}">
-                                    <img src="${'data:image/jpeg;base64,' + photo.file}" class="d-block " style="height:200px"/>
+                                    <img src="${'https://maps.rda.gov.ge/images/' + photo.name}" class="d-block " style="height:200px"/>
                                 </div>`;
                     }).join('');
 
@@ -297,6 +316,10 @@
     @media screen and (max-width: 768px) {
         #texts {
             float: left !important;
+        }
+
+        .main-search-block {
+            margin-right: 120px !important;
         }
 
         input[type="search"] {

@@ -52,7 +52,7 @@
                 </thead>
                 <tbody>
                     <tr v-for="(item, index) in data" :key="index">
-                        <th>{{ item.id }}</th>
+                        <th>{{ index + 1 }}</th>
                         <td>{{ item.enterprise_name }}</td>
                         <td>{{ item.enterprise_field }}</td>
                         <td>{{ item.location_name }}</td>
@@ -78,7 +78,7 @@
                 </thead>
                 <tbody>
                     <tr v-for="(item, index) in project_data" :key="index">
-                        <th>{{ item.id }}</th>
+                        <th>{{ index + 1 }}</th>
                         <td>{{ item.project_name }}</td>
                         <td class="text-center">
                             <div class="btn-group">
@@ -169,6 +169,8 @@
         },
 
         mounted() {
+            document.title = "სამართავი გვერდი";
+            
             const data = window.localStorage.getItem("user");
             const thi_s = this;
             
