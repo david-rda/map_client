@@ -1,7 +1,7 @@
 <template>
     <div class="container" style="margin-top: 5%">
         <div class="row justify-content-center">
-            <div class="col-lg-6 col-md-6 col-xs-12 col-sm-12">
+            <div class="col-lg-5 col-md-5 col-xs-12 col-sm-12">
                 <div class="header-logo">
                     <img src="../assets/img/rda-logo-t.88318a3d.png" />
                 </div>
